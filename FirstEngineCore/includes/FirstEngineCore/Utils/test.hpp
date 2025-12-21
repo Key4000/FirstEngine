@@ -1,0 +1,3 @@
+namespace FirstEngine {
+	void sayHello();
+}
