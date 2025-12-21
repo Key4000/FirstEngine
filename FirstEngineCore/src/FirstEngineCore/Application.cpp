@@ -1,13 +1,18 @@
-#include <iostream>
-
-#include "FirstEngineCore/Utils/test.hpp"
+#include "FirstEngineCore/Application.hpp"
 
 #include <GLFW/glfw3.h>
 
-namespace FirstEngine {
-	int checkGLFW() {
-		std::cout << "Hello from Simple Engine Core " << std::endl;
+#include <iostream>
 
+namespace FirstEngine {
+
+	Application::Application() {
+
+	}
+	Application::~Application() {
+
+	}
+	int Application::start(unsigned int window_width, unsigned int window_height, const char* title) {
         GLFWwindow* window;
 
         /* Initialize the library */
@@ -15,7 +20,7 @@ namespace FirstEngine {
             return -1;
 
         /* Create a windowed mode window and its OpenGL context */
-        window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+        window = glfwCreateWindow(window_width, window_height, title, NULL, NULL);
         if (!window)
         {
             glfwTerminate();
@@ -26,6 +31,7 @@ namespace FirstEngine {
         glfwMakeContextCurrent(window);
 
         /* Loop until the user closes the window */
+        //самый главный цикл , здесь происходит сама игра , здесь рисуются кадры игры
         while (!glfwWindowShouldClose(window))
         {
             /* Render here */
@@ -36,10 +42,15 @@ namespace FirstEngine {
 
             /* Poll for and process events */
             glfwPollEvents();
+
+            //в каждый кадр , будет вызываться эта функция 
+            on_update();
         }
 
         glfwTerminate();
 
         return 0;
 	}
+
+
 }

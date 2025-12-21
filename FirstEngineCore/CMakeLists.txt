@@ -3,10 +3,21 @@ cmake_minimum_required(VERSION 4.2.1)
 #устанавливаем имя 
 set(ENGINE_PROJECT_NAME FirstEngineCore)
 
+#здесь хранятся все инклуды , что хранятся публично
+set(ENGINE_PUBLIC_INCLUDES 
+    includes/FirstEngineCore/Application.hpp
+)
+
+#здесь хранятся все исходные коды 
+set(ENGINE_PRIVATE_SOURCES 
+    src/FirstEngineCore/Application.cpp
+)
+
+
 #создаем библиотеку
 add_library(${ENGINE_PROJECT_NAME} STATIC 
-    src/FirstEngineCore/Utils/test.cpp
-    includes/FirstEngineCore/Utils/test.hpp
+    ${ENGINE_PUBLIC_INCLUDES}
+    ${ENGINE_PRIVATE_SOURCES}
 )
 
 #подключение к линковке таргетов(внешние библиотеки)

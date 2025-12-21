@@ -1,3 +1,0 @@
-namespace FirstEngine {
-	int checkGLFW();
-}
