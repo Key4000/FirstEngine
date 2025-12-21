@@ -1,3 +1,3 @@
 namespace FirstEngine {
-	void sayHello();
+	int checkGLFW();
 }
