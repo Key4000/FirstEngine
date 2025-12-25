@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace FirstEngine {
 	class Application
 	{
@@ -20,5 +22,9 @@ namespace FirstEngine {
 		//функция будет вызываться каждый кадр 
 		//каждый кадр , который будет прорисовываться , будет вызывать внутри себя эту функцию
 		virtual void on_update(){}
+
+	private:
+
+		std::unique_ptr<class Window> m_pWindow;
 	};
 }
