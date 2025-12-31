@@ -9,9 +9,7 @@ namespace FirstEngine {
     static bool s_GLFW_initialized = false;
 
 	Window::Window(std::string title, const unsigned int width, const unsigned int height) 
-		:m_title(std::move(title))
-		, m_width(width)
-		, m_height(height)
+        :m_data({ std::move(title), width, height })
 	{
 		int resultCode = init();
 	}
@@ -19,14 +17,12 @@ namespace FirstEngine {
 		shutdown();
 	}
 
-	//функция будет вызываться каждый кадр 
-	//каждый кадр , который будет прорисовываться , будет вызывать внутри себя эту функцию
+	//РЅР°С€Р° С„СѓРєС†РёСЏ , РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ РІ РєР°Р¶РґРѕРј РєР°РґСЂРµ
 	void Window::on_update() {
-        //изменить цвет заливки буфера
+        //РёР·РјРµРЅСЏРµРј Р±СѓС„РµСЂ С†РІРµС‚Р°
         glClearColor(1, 0, 0, 0);
 
-        /* Render here */
-        //в каждый кадр заливаем этот буфер 
+        //СЂРёСЃСѓРµРј 
         glClear(GL_COLOR_BUFFER_BIT);
 
         /* Swap front and back buffers */
@@ -36,12 +32,12 @@ namespace FirstEngine {
         glfwPollEvents();
 	}
 
-	//вспомогательная функция для инициализации в конструкции
+	//РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РІ РЅР°С€РµРј РєР»Р°СЃСЃРµ 
 	int Window::init() {
-        LOG_INFO("Creating window `{0}` width size {1}x{2}", m_title, m_width, m_height);
+        LOG_INFO("Creating window `{0}` width size {1}x{2}", m_data.title, m_data.width, m_data.height);
 
         /* Initialize the library */
-        //инициализация glfw 
+        //РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј glfw 
         if (!s_GLFW_initialized) {
             if (!glfwInit())
             {
@@ -52,31 +48,64 @@ namespace FirstEngine {
         }
         
 
-        //создаем окно
-        m_pWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
-        //если окно не создалось 
+        //СЃРѕР·РґР°РµРј РѕРєРЅРѕ
+        m_pWindow = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
+        //РµСЃР»Рё РѕРєРЅРѕ РЅРµ СЃРѕР·РґР°Р»РѕСЃСЊ 
         if (!m_pWindow)
         {
-            LOG_CRITICAL("Can't create window {0} width size {1}x{2}", m_title, m_width, m_height)
+            LOG_CRITICAL("Can't create window {0} width size {1}x{2}", m_data.title, m_data.width, m_data.height)
             glfwTerminate();
             return -2;
         }
 
         /* Make the window's context current */
-        //создаем текущий контекст окна
+        //СЃРѕР·РґР°РµРј РєРѕРЅС‚РµРєСЃС‚ РѕРєРЅР°
         glfwMakeContextCurrent(m_pWindow);
 
-        //загружаем функции openGL через GLAD
+        //Р·Р°РіСЂСѓР¶Р°РµРј С„СѓРЅРєС†РёРё openGL СЃ РїРѕРјРѕС‰СЊСЋ GLAD
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
             LOG_CRITICAL("Failed to initialize GLAD")
                 return -3;
         }
+        //РѕСЃС‚Р°РІР»СЏРµРј СЃСЃС‹Р»РєСѓ РЅР° СЃРІРѕРё РґР°РЅРЅС‹Рµ РІ С…РµРЅРґР»Рµ
+        glfwSetWindowUserPointer(m_pWindow, &m_data);
+
+        //Р»РѕРІРёРј РєРѕР»Р±СЌРє РёР·РјРµРЅРµРЅРёСЏ СЂР°Р·РјРµСЂР° РѕРєРЅР°
+        glfwSetWindowSizeCallback(m_pWindow,
+            [](GLFWwindow* pWindow, int width, int height)
+            {
+                //РїРѕР»СѓС‡Р°РµРј РґР°РЅРЅС‹Рµ РёР· С…РµРЅРґР»Р°
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
+
+                data.width = width;
+                data.height = height;
+
+                //РїРёС€РµРј РґР°РЅРЅС‹Рµ , С‡С‚РѕР±С‹ РѕС‚РїСЂР°РІРёС‚СЊ РІ РЅР°С€ РёРІРµРЅС‚ 
+                EventWindowResize event(width, height);
+                //РІС‹Р·С‹РІР°РµРј РЅР°С€ РєРѕР»Р±СЌРє
+                data.eventCallbackFn(event);
+                
+            }
+        );
+
+        glfwSetCursorPosCallback(m_pWindow,
+            [](GLFWwindow* pWindow, double x, double y) {
+
+                //РїРѕР»СѓС‡Р°РµРј РґР°РЅРЅС‹Рµ РёР· С…РµРЅРґР»Р°
+                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));      
+
+                //РїРёС€РµРј РґР°РЅРЅС‹Рµ , С‡С‚РѕР±С‹ РѕС‚РїСЂР°РІРёС‚СЊ РІ РЅР°С€ РёРІРµРЅС‚ 
+                EventMouseMoved event(x, y);
+                //РІС‹Р·С‹РІР°РµРј РЅР°С€ РєРѕР»Р±СЌРє
+                data.eventCallbackFn(event);
+            }
+        );
 
         return 0;
         
 	}
-	//вспомогательная функция для уничтожения окна
+	//Р·Р°РєСЂС‹С‚РёРµ РѕРєРЅР°
 	void Window::shutdown() {
 
         glfwDestroyWindow(m_pWindow);

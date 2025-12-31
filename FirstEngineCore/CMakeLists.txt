@@ -7,6 +7,7 @@ set(ENGINE_PROJECT_NAME FirstEngineCore)
 set(ENGINE_PUBLIC_INCLUDES 
     includes/FirstEngineCore/Application.hpp
     includes/FirstEngineCore/Log.hpp
+    includes/FirstEngineCore/Event.hpp
 )
 
 #здесь хранятся все приватные инклуды

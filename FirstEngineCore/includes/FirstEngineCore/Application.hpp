@@ -24,7 +24,11 @@ namespace FirstEngine {
 		virtual void on_update(){}
 
 	private:
-
+		//хендл окна
 		std::unique_ptr<class Window> m_pWindow;
+
+		//будет содержать все колбэки по конкретному типу ивента
+		EventDispatcher m_event_dispatcher;
+		bool m_bCloseWindow = false;
 	};
 }
