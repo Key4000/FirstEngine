@@ -14,10 +14,10 @@ namespace FirstEngine {
 	}
 	int Application::start(unsigned int window_width, unsigned int window_height, const char* title) {
         
-		//создаем окно 
+		//Г±Г®Г§Г¤Г ГҐГ¬ Г®ГЄГ­Г® 
 		m_pWindow = std::make_unique<Window>(title, window_width, window_height);
 
-		//---------------------коллбэки по событию---------------------------------------
+		//---------------------ГЄГ®Г«Г«ГЎГЅГЄГЁ ГЇГ® Г±Г®ГЎГ»ГІГЁГѕ---------------------------------------
 		m_event_dispatcher.add_event_listener<EventMouseMoved>(
 			[](EventMouseMoved& event)
 			{
@@ -25,12 +25,12 @@ namespace FirstEngine {
 		});
 
 		m_event_dispatcher.add_event_listener<EventWindowResize>(
-			[&](EventWindowResize& event)
+			[](EventWindowResize& event)
 			{
 				LOG_INFO("[Resized] Changed size to {0}x{1}", event.width, event.height);
 				
 		});
-		//каждый раз когда приходит какой то ивент
+		//ГЄГ Г¦Г¤Г»Г© Г°Г Г§ ГЄГ®ГЈГ¤Г  ГЇГ°ГЁГµГ®Г¤ГЁГІ ГЄГ ГЄГ®Г© ГІГ® ГЁГўГҐГ­ГІ
 		m_pWindow->set_event_callback(
 			[&](BaseEvent& event)
 			{
@@ -39,12 +39,12 @@ namespace FirstEngine {
 		);
 		//-----------------------------------------------------------------------------
 
-		//игровой цикл , который будет рисовать каждый кадр игры
+		//ГЁГЈГ°Г®ГўГ®Г© Г¶ГЁГЄГ« , ГЄГ®ГІГ®Г°Г»Г© ГЎГіГ¤ГҐГІ Г°ГЁГ±Г®ГўГ ГІГј ГЄГ Г¦Г¤Г»Г© ГЄГ Г¤Г° ГЁГЈГ°Г»
 		while (true)
 		{
-			//для своего окна 
+			//Г¤Г«Гї Г±ГўГ®ГҐГЈГ® Г®ГЄГ­Г  
 			m_pWindow->on_update();
-			//для пользователя движка , для переиспользования 
+			//Г¤Г«Гї ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«Гї Г¤ГўГЁГ¦ГЄГ  , Г¤Г«Гї ГЇГҐГ°ГҐГЁГ±ГЇГ®Г«ГјГ§Г®ГўГ Г­ГЁГї 
 			on_update();
 		}
 
