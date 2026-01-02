@@ -60,5 +60,8 @@ namespace FirstEngine {
 
 		//сама переменная с данными
 		WindowData m_data;
+
+		float m_background_color[4] = {0.f, 0.f, 0.f, 0.f}; //для хранения цвета фона
+
 	};
 }

@@ -6,6 +6,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 namespace FirstEngine {
 
@@ -18,12 +19,13 @@ namespace FirstEngine {
 		int resultCode = init();
 
         //подключение ImGui
-        //проверяем версию
-        IMGUI_CHECKVERSION();
-        //создаем контекст 
-        ImGui::CreateContext();
-        //opengl для imgui
-        ImGui_ImplOpenGL3_Init();
+        IMGUI_CHECKVERSION();       //проверяем версию
+        
+        ImGui::CreateContext();     //создаем контекст 
+        
+        ImGui_ImplOpenGL3_Init();   //opengl для imgui
+
+        ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true); //инициализируем бэкенд imgui для связки с glfw для openGl(можно и vulkan)
 
 	}
 
@@ -35,24 +37,30 @@ namespace FirstEngine {
 	//изменение в окне , вся отрисовка тут
 	void Window::on_update() {
        
-        glClearColor(0, 0, 0, 0);  //изменяем буфер цвета       
-        glClear(GL_COLOR_BUFFER_BIT); //рисуем 
+        glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);           //изменяем буфер цвета       
+        glClear(GL_COLOR_BUFFER_BIT);       //рисуем 
 
-        ImGuiIO& io = ImGui::GetIO(); //хендл  ввода вывода
+        ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
         
         io.DisplaySize.x = static_cast<float>(get_width());    //указать размер окна по горизонтали , виджеты должны совпадать с этим размером
         io.DisplaySize.y = static_cast<float>(get_height());   //указать размер окна по вертикали , виджеты должны совпадать с этим размером
         
         //создание фрейма где мы будем рисовать
-        ImGui_ImplOpenGL3_NewFrame();   //начинаем новый фрейм 
-        ImGui::NewFrame();  //создаем новый фрейм самого ImGui
+        ImGui_ImplOpenGL3_NewFrame();   //кадр для openGL
+        ImGui_ImplGlfw_NewFrame();      //кадр для glfw
+        ImGui::NewFrame();              //кадр самого ImGui
         
         //виджеты 
-        ImGui::ShowDemoWindow();   
+        ImGui::ShowDemoWindow();        //демо
+
+        //выбор цвета фона
+        ImGui::Begin("Background Color Window");                    //начало нового окна
+        ImGui::ColorEdit4("Background Color", m_background_color);  //виджет изменения цвета
+        ImGui::End();                                               //закрытие окна
 
         //рендер
-        ImGui::Render();    //создаем данные для рендера в GetDrawData
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным из GetDrawData
+        ImGui::Render();                                            //сохраняем данные для рендера
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным рендера
 
 
 
