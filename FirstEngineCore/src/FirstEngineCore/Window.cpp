@@ -4,35 +4,65 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
+#include <imgui/imgui.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
+
 namespace FirstEngine {
 
     static bool s_GLFW_initialized = false;
 
+    //конструктор окна
 	Window::Window(std::string title, const unsigned int width, const unsigned int height) 
         :m_data({ std::move(title), width, height })
 	{
 		int resultCode = init();
+
+        //подключение ImGui
+        //проверяем версию
+        IMGUI_CHECKVERSION();
+        //создаем контекст 
+        ImGui::CreateContext();
+        //opengl для imgui
+        ImGui_ImplOpenGL3_Init();
+
 	}
+
+    //деструктор окна 
 	Window::~Window() {
 		shutdown();
 	}
 
-	//наша фукция , для изменения в каждом кадре
+	//изменение в окне , вся отрисовка тут
 	void Window::on_update() {
-        //изменяем буфер цвета
-        glClearColor(1, 0, 0, 0);
+       
+        glClearColor(0, 0, 0, 0);  //изменяем буфер цвета       
+        glClear(GL_COLOR_BUFFER_BIT); //рисуем 
 
-        //рисуем 
-        glClear(GL_COLOR_BUFFER_BIT);
+        ImGuiIO& io = ImGui::GetIO(); //хендл  ввода вывода
+        
+        io.DisplaySize.x = static_cast<float>(get_width());    //указать размер окна по горизонтали , виджеты должны совпадать с этим размером
+        io.DisplaySize.y = static_cast<float>(get_height());   //указать размер окна по вертикали , виджеты должны совпадать с этим размером
+        
+        //создание фрейма где мы будем рисовать
+        ImGui_ImplOpenGL3_NewFrame();   //начинаем новый фрейм 
+        ImGui::NewFrame();  //создаем новый фрейм самого ImGui
+        
+        //виджеты 
+        ImGui::ShowDemoWindow();   
+
+        //рендер
+        ImGui::Render();    //создаем данные для рендера в GetDrawData
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным из GetDrawData
+
+
 
         /* Swap front and back buffers */
         glfwSwapBuffers(m_pWindow);
-
         /* Poll for and process events */
         glfwPollEvents();
 	}
 
-	//инициализация в нашем классе 
+	//инициализация окна
 	int Window::init() {
         LOG_INFO("Creating window `{0}` width size {1}x{2}", m_data.title, m_data.width, m_data.height);
 
@@ -105,11 +135,23 @@ namespace FirstEngine {
             }
         );
 
+        //ловим колбэк закрытия окна
+        glfwSetWindowCloseCallback(m_pWindow, [](GLFWwindow* pWindow) {
+            //получаем данные из хендла
+            WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
+            //пишем данные , чтобы отправить в наш ивент 
+            EventWindowClose event;
+            //вызываем наш колбэк
+            data.eventCallbackFn(event);
+            }
+        );
+
         //--------------------------------------------------------------------------------------------------
 
         return 0;
         
 	}
+
 	//закрытие окна
 	void Window::shutdown() {
 

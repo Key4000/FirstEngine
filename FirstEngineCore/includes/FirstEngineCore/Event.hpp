@@ -8,7 +8,7 @@
 namespace FirstEngine {
     enum class EventType {
         WindowResize = 0,
-        WindowCloze,
+        WindowClose,
 
         //клавиша нажата и отпущена 
         KeyPressed,
@@ -94,5 +94,16 @@ namespace FirstEngine {
         unsigned int height;
 
         static const EventType type = EventType::WindowResize;
+    };
+
+    //событие закрытия окна
+    struct EventWindowClose : public BaseEvent
+    {
+        virtual EventType get_type() const override
+        {
+            return type;
+        }
+
+        static const EventType type = EventType::WindowClose;
     };
 }

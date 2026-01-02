@@ -1,6 +1,7 @@
 #include "FirstEngineCore/Application.hpp"
 #include "FirstEngineCore/Log.hpp"
 #include "FirstEngineCore/Window.hpp"
+#include "FirstEngineCore/Event.hpp"
 
 #include <iostream>
 
@@ -37,10 +38,12 @@ namespace FirstEngine {
                 LOG_INFO("[WindowClose]");
                 m_bCloseWindow = true;
             });
-        //основной слушатель , который принимает все события 
+        
+        //вызывается каждый раз когда приходит какой то ивент от хендла окна
         m_pWindow->set_event_callback(
             [&](BaseEvent& event)
             {
+                //функция обработки базового ивента в специальный 
                 m_event_dispatcher.dispatch(event);
             }
         );
@@ -54,9 +57,6 @@ namespace FirstEngine {
         }
         //автоматически вызываем деструктор окна 
         m_pWindow = nullptr;
-
-//тестируем кодировку
-
 
         return 0;
     }

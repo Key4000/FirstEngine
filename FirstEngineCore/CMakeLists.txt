@@ -52,3 +52,38 @@ target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE spdlog)
 add_subdirectory(../external/glad ${CMAKE_CURRENT_BINARY_DIR}/glad)
 #прилинкуем библиотеку к движку(приватно , чтобы editor при линковке не видел библиотеку(снаружи движка ничего не будет известно о библиотеке))
 target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE glad)
+
+#---------добавляем руками библиотеку ImGui-----------
+
+#устанавливаем файлы под именами IMGUI_INCLUDES и IMGUI_SOURCES
+set(IMGUI_INCLUDES
+ ../external/imgui/imgui.h
+ ../external/imgui/backends/imgui_impl_glfw.h
+ ../external/imgui/backends/imgui_impl_opengl3.h
+) 
+set(IMGUI_SOURCES
+ ../external/imgui/imgui.cpp
+ ../external/imgui/backends/imgui_impl_glfw.cpp
+ ../external/imgui/backends/imgui_impl_opengl3.cpp
+ ../external/imgui/imgui_draw.cpp
+ ../external/imgui/imgui_tables.cpp
+ ../external/imgui/imgui_widgets.cpp
+ ../external/imgui/imgui_demo.cpp
+) 
+
+#добавляем статичную библиотеку
+add_library(ImGui STATIC
+  ${IMGUI_INCLUDES} 
+  ${IMGUI_SOURCES} 
+) 
+
+#дериктории подключения
+target_include_directories(ImGui PUBLIC ../external)
+target_include_directories(ImGui PUBLIC ../external/imgui)
+
+#подключаем к библиотеке glfw и glad
+target_link_libraries(ImGui PRIVATE glad glfw)
+
+#подключаем библиотеку определенную сверху к проекту 
+target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE ImGui)
+

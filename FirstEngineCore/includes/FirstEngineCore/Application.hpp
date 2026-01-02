@@ -1,5 +1,7 @@
 #pragma once
 
+#include "FirstEngineCore/Event.hpp"
+
 #include <memory>
 
 namespace FirstEngine {
