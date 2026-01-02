@@ -71,6 +71,8 @@ namespace FirstEngine {
         //оставляем ссылку на свои данные в хендле
         glfwSetWindowUserPointer(m_pWindow, &m_data);
 
+        //------------------------ловим колбэки--------------------------------------------------
+
         //ловим колбэк изменения размера окна
         glfwSetWindowSizeCallback(m_pWindow,
             [](GLFWwindow* pWindow, int width, int height)
@@ -89,6 +91,7 @@ namespace FirstEngine {
             }
         );
 
+        //ловим колбэк изменения позиции курсора 
         glfwSetCursorPosCallback(m_pWindow,
             [](GLFWwindow* pWindow, double x, double y) {
 
@@ -101,6 +104,8 @@ namespace FirstEngine {
                 data.eventCallbackFn(event);
             }
         );
+
+        //--------------------------------------------------------------------------------------------------
 
         return 0;
         
