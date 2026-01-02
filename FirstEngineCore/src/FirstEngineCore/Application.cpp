@@ -55,6 +55,8 @@ namespace FirstEngine {
         //автоматически вызываем деструктор окна 
         m_pWindow = nullptr;
 
+//тестируем кодировку
+
 
         return 0;
     }
