@@ -1,8 +1,10 @@
 #include "FirstEngineCore/Window.hpp"
 #include "FirstEngineCore/Log.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp"
 
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
+#include <glad/glad.h> 
+#include <gl/GL.h>
 
 #include <imgui/imgui.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
@@ -11,6 +13,40 @@
 namespace FirstEngine {
 
     static bool s_GLFW_initialized = false;
+
+    GLfloat points[] = {
+        0.0f,  0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+       -0.5f, -0.5f, 0.0f
+    };
+
+    GLfloat colors[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
+
+    const char* vertex_shader =
+        "#version 460\n"
+        "layout(location = 0) in vec3 vertex_position;"
+        "layout(location = 1) in vec3 vertex_color;"
+        "out vec3 color;"
+        "void main() {"
+        "   color = vertex_color;"
+        "   gl_Position = vec4(vertex_position, 1.0);"
+        "}";
+
+    const char* fragment_shader =
+        "#version 460\n"
+        "in vec3 color;"
+        "out vec4 frag_color;"
+        "void main() {"
+        "   frag_color = vec4(color, 1.0);"
+        "}";
+
+    //указатель на шейдерную программу
+    std::unique_ptr<ShaderProgram> p_shader_program;
+    GLuint vao;
 
     //конструктор окна
 	Window::Window(std::string title, const unsigned int width, const unsigned int height) 
@@ -32,42 +68,6 @@ namespace FirstEngine {
     //деструктор окна 
 	Window::~Window() {
 		shutdown();
-	}
-
-	//изменение в окне , вся отрисовка тут
-	void Window::on_update() {
-       
-        glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);           //изменяем буфер цвета       
-        glClear(GL_COLOR_BUFFER_BIT);       //рисуем 
-
-        ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
-        
-        io.DisplaySize.x = static_cast<float>(get_width());    //указать размер окна по горизонтали , виджеты должны совпадать с этим размером
-        io.DisplaySize.y = static_cast<float>(get_height());   //указать размер окна по вертикали , виджеты должны совпадать с этим размером
-        
-        //создание фрейма где мы будем рисовать
-        ImGui_ImplOpenGL3_NewFrame();   //кадр для openGL
-        ImGui_ImplGlfw_NewFrame();      //кадр для glfw
-        ImGui::NewFrame();              //кадр самого ImGui
-        
-        //виджеты 
-        ImGui::ShowDemoWindow();        //демо
-
-        //выбор цвета фона
-        ImGui::Begin("Background Color Window");                    //начало нового окна
-        ImGui::ColorEdit4("Background Color", m_background_color);  //виджет изменения цвета
-        ImGui::End();                                               //закрытие окна
-
-        //рендер
-        ImGui::Render();                                            //сохраняем данные для рендера
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным рендера
-
-
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(m_pWindow);
-        /* Poll for and process events */
-        glfwPollEvents();
 	}
 
 	//инициализация окна
@@ -154,11 +154,106 @@ namespace FirstEngine {
             }
         );
 
-        //--------------------------------------------------------------------------------------------------
+        //################################################################
+
+
+
+        //получение кол-ва пикселей (размер окна  для ретина-мониторов) 
+        glfwSetFramebufferSizeCallback(m_pWindow, 
+            [](GLFWwindow* pWindow, int width, int height)
+            {
+                glViewport(0, 0, width, height);
+
+            }
+        );
+
+        p_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
+        if (!p_shader_program->isCompiled())
+        {
+            return false;
+        }
+
+        //передаем всю необходимую информацию о шейдерах в память видеокарты
+        
+        //--------------
+        //буфер точек 
+        GLuint points_vbo = 0; //vertex buffer object
+        glGenBuffers(1, &points_vbo);    //(колво буферов, ссылка) - генератор буфера 
+        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);    //выбрать текущий буфер 
+        glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);    //передаем данные из ОП в видеопамять
+        
+        //буфер цвета 
+        GLuint colors_vbo = 0; //vertex buffer object
+        glGenBuffers(1, &colors_vbo);    //(колво буферов, ссылка) - генератор буфера 
+        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);    //выбрать текущий буфер 
+        glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
+        //--------------
+
+       //указываем видеокарте как обрабатывать полученные буферы
+
+        glGenVertexArrays(1, &vao);    //vertex array object генерация
+        glBindVertexArray(vao);   //сделать текущим 
+
+        //связываем vao с шейдером, 0 позиция
+        glEnableVertexAttribArray(0); //включаем 0 позицию 
+        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);    //выбрать текущий буфер 
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        //связываем vbo с шейдером, 1 позиция
+        glEnableVertexAttribArray(1); //включаем 1 позицию 
+        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);    //выбрать текущий буфер 
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        //###############################################################
+
 
         return 0;
         
 	}
+
+    //изменение в окне , вся отрисовка тут
+    void Window::on_update() {
+
+        glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);           //изменяем буфер цвета       
+        glClear(GL_COLOR_BUFFER_BIT);       //рисуем 
+
+        //#####################################################      
+
+        p_shader_program->bind();   //выбираем текущую шейдерную программу для отрисовки
+        glBindVertexArray(vao); //подключаем vao, содержит привязки ко всем данным, ко всем буферам 
+        glDrawArrays(GL_TRIANGLES, 0, 3);   //команда отрисовки        
+
+        //#####################################################
+
+        ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
+
+        io.DisplaySize.x = static_cast<float>(get_width());    //указать размер окна по горизонтали , виджеты должны совпадать с этим размером
+        io.DisplaySize.y = static_cast<float>(get_height());   //указать размер окна по вертикали , виджеты должны совпадать с этим размером
+
+        //создание фрейма где мы будем рисовать
+        ImGui_ImplOpenGL3_NewFrame();   //кадр для openGL
+        ImGui_ImplGlfw_NewFrame();      //кадр для glfw
+        ImGui::NewFrame();              //кадр самого ImGui
+
+        //виджеты 
+        ImGui::ShowDemoWindow();        //демо
+
+        //выбор цвета фона
+        ImGui::Begin("Background Color Window");                    //начало нового окна
+        ImGui::ColorEdit4("Background Color", m_background_color);  //виджет изменения цвета
+        ImGui::End();                                               //закрытие окна
+
+        //рендер
+        ImGui::Render();                                            //сохраняем данные для рендера
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным рендера
+
+
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(m_pWindow);
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
 
 	//закрытие окна
 	void Window::shutdown() {
