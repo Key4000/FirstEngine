@@ -8,7 +8,7 @@ namespace FirstEngine{
   //вспомогательная функция для создания шейдера 
   bool create_shader(const char* source, const GLenum shader_type, GLuint& shader_id){
  
-    GLuint vs = glCreateShader(shader_type);   //создаем шейдер по его типу 
+    shader_id = glCreateShader(shader_type);   //создаем шейдер по его типу 
     glShaderSource(shader_id, 1, & source, nullptr);   //передача кода шейдеру по его id 
     glCompileShader(shader_id);    //компиляция шейдера по его id
     
