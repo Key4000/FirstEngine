@@ -25,9 +25,10 @@ namespace FirstEngine{
         //делает этот шейдер не текущим
         static void unbind();
         //проверка на скомпилированность
-        bool isCompiled() const { return m_isCompiled; }
+        bool isCompiled() const { return m_is_compiled; }
     private:
-        bool m_isCompiled = false;
+        bool m_is_compiled = false;
         unsigned int m_id = 0;
     };
+
 }

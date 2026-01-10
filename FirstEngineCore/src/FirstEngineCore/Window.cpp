@@ -1,6 +1,8 @@
 #include "FirstEngineCore/Window.hpp"
 #include "FirstEngineCore/Log.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/VertexArray.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h> 
@@ -26,6 +28,12 @@ namespace FirstEngine {
         0.0f, 0.0f, 1.0f
     };
 
+    GLfloat positions_colors[] = {
+        1.0f, 0.0f, 0.0f,   1.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,   0.0f, 1.0f, 1.0f,
+        0.0f, 0.0f, 1.0f,    1.0f, 0.0f, 1.0f
+    };
+
     const char* vertex_shader =
         "#version 460\n"
         "layout(location = 0) in vec3 vertex_position;"
@@ -46,7 +54,17 @@ namespace FirstEngine {
 
     //указатель на шейдерную программу
     std::unique_ptr<ShaderProgram> p_shader_program;
-    GLuint vao;
+
+    //указатели на 2 vertex buffer и vertex array 
+    std::unique_ptr<VertexBuffer> p_points_vbo;
+    std::unique_ptr<VertexBuffer> p_colors_vbo;
+    std::unique_ptr<VertexArray> p_vao_2buffer;
+
+    //указатели на 1 буфер и vertex array
+    std::unique_ptr<VertexBuffer> p_positions_colors_vbo;
+    std::unique_ptr<VertexArray> p_vao_1buffer;
+    
+    
 
     //конструктор окна
 	Window::Window(std::string title, const unsigned int width, const unsigned int height) 
@@ -154,9 +172,7 @@ namespace FirstEngine {
             }
         );
 
-        //################################################################
-
-
+        //---------------------работа с шейдерами--------------------------
 
         //получение кол-ва пикселей (размер окна  для ретина-мониторов) 
         glfwSetFramebufferSizeCallback(m_pWindow, 
@@ -171,40 +187,21 @@ namespace FirstEngine {
         if (!p_shader_program->isCompiled())
         {
             return false;
-        }
+        };
 
         //передаем всю необходимую информацию о шейдерах в память видеокарты
         
-        //--------------
-        //буфер точек 
-        GLuint points_vbo = 0; //vertex buffer object
-        glGenBuffers(1, &points_vbo);    //(колво буферов, ссылка) - генератор буфера 
-        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);    //выбрать текущий буфер 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);    //передаем данные из ОП в видеопамять
+        //вертексный буфер точек 
+        p_points_vbo = std::make_unique<VertexBuffer>(points, sizeof(points));
+        //вертексный буфер цвета
+        p_colors_vbo = std::make_unique<VertexBuffer>(colors, sizeof(colors));
+        //вертексный массив объектов
+        p_vao = std::make_unique<VertexArray>();
         
-        //буфер цвета 
-        GLuint colors_vbo = 0; //vertex buffer object
-        glGenBuffers(1, &colors_vbo);    //(колво буферов, ссылка) - генератор буфера 
-        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);    //выбрать текущий буфер 
-        glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-        //--------------
+        p_vao->add_buffer(*p_points_vbo);
+        p_vao->add_buffer(*p_colors_vbo);
 
-       //указываем видеокарте как обрабатывать полученные буферы
-
-        glGenVertexArrays(1, &vao);    //vertex array object генерация
-        glBindVertexArray(vao);   //сделать текущим 
-
-        //связываем vao с шейдером, 0 позиция
-        glEnableVertexAttribArray(0); //включаем 0 позицию 
-        glBindBuffer(GL_ARRAY_BUFFER, points_vbo);    //выбрать текущий буфер 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-        //связываем vbo с шейдером, 1 позиция
-        glEnableVertexAttribArray(1); //включаем 1 позицию 
-        glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);    //выбрать текущий буфер 
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-        //###############################################################
+        //---------------------------------------------------------------------
 
 
         return 0;
@@ -217,13 +214,13 @@ namespace FirstEngine {
         glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);           //изменяем буфер цвета       
         glClear(GL_COLOR_BUFFER_BIT);       //рисуем 
 
-        //#####################################################      
+        //--------------------------работа с шейдерами-----------------------------    
 
         p_shader_program->bind();   //выбираем текущую шейдерную программу для отрисовки
-        glBindVertexArray(vao); //подключаем vao, содержит привязки ко всем данным, ко всем буферам 
+        p_vao->bind();      //делаем vertex array текущим 
         glDrawArrays(GL_TRIANGLES, 0, 3);   //команда отрисовки        
 
-        //#####################################################
+        //------------------------------------------------------------------------
 
         ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
 

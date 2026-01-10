@@ -14,6 +14,8 @@ set(ENGINE_PUBLIC_INCLUDES
 set(ENGINE_PRIVATE_INCLUDES 
     src/FirstEngineCore/Window.hpp
     src/FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp
+    src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp
+    src/FirstEngineCore/Rendering/OpenGL/VertexArray.hpp
 )
 
 #здесь хранятся все исходные коды 
@@ -21,6 +23,8 @@ set(ENGINE_PRIVATE_SOURCES
     src/FirstEngineCore/Application.cpp
     src/FirstEngineCore/Window.cpp
     src/FirstEngineCore/Rendering/OpenGL/ShaderProgram.cpp
+    src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.cpp
+    src/FirstEngineCore/Rendering/OpenGL/VertexArray.cpp
 )
 
 #задаем переменную

@@ -71,7 +71,7 @@ namespace FirstEngine{
     }
     else 
     {
-      m_isCompiled = true;
+        m_is_compiled = true;
     }
     
     //открепляем шейдер от программы
@@ -98,25 +98,25 @@ namespace FirstEngine{
   }
   
   //перемещение 
-  ShaderProgram& ShaderProgram::operator=(ShaderProgram&& shaderProgram){
+  ShaderProgram& ShaderProgram::operator=(ShaderProgram&& shader_program){
     glDeleteProgram(m_id);
-    m_id = shaderProgram.m_id;
-    m_isCompiled = shaderProgram.m_isCompiled;
+    m_id = shader_program.m_id;
+    m_is_compiled = shader_program.m_is_compiled;
     
     //затираем аргумент, чтобы два раза не вызвался деструктор
-    shaderProgram.m_id = 0;
-    shaderProgram.m_isCompiled = false;
+    shader_program.m_id = 0;
+    shader_program.m_is_compiled = false;
     return *this;
   }
   
   //конструктор перемещения 
-  ShaderProgram::ShaderProgram (ShaderProgram&& shaderProgram)
+  ShaderProgram::ShaderProgram (ShaderProgram&& shader_program)
   {
-    m_id = shaderProgram.m_id;
-    m_isCompiled = shaderProgram.m_isCompiled;
+    m_id = shader_program.m_id;
+    m_is_compiled = shader_program.m_is_compiled;
     //затираем аргумент, чтобы два раза не вызвался деструктор
-    shaderProgram.m_id = 0;
-    shaderProgram.m_isCompiled = false;
+    shader_program.m_id = 0;
+    shader_program.m_is_compiled = false;
   } 
   
 }
