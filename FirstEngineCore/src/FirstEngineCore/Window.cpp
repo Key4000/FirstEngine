@@ -191,16 +191,41 @@ namespace FirstEngine {
 
         //передаем всю необходимую информацию о шейдерах в память видеокарты
         
-        //вертексный буфер точек 
-        p_points_vbo = std::make_unique<VertexBuffer>(points, sizeof(points));
-        //вертексный буфер цвета
-        p_colors_vbo = std::make_unique<VertexBuffer>(colors, sizeof(colors));
-        //вертексный массив объектов
-        p_vao = std::make_unique<VertexArray>();
-        
-        p_vao->add_buffer(*p_points_vbo);
-        p_vao->add_buffer(*p_colors_vbo);
+        //создаем окружение для 2 буферов 
+BufferLayout buffer_layout_1vec3
+{
+  ShaderDataType::Float3
+};
 
+       //vertex array для 2 буферов
+       p_vao_2buffers = std::make_unique<VertexArray>(); 
+
+       //vertex буфер для точек 
+       p_points_vbo =    std::make_unique<VertexBuffer>(points, sizeof(points), buffer_layout_1vec3);  
+
+       //vertex буфер для цвета 
+       p_colors_vbo = std::make_unique<VertexBuffer>(colors, sizeof(colors), buffer_layout_1vec3);
+
+//добавляем 2 буфера в vertex array
+p_vao_2buffers->add_buffer(*p_points_vbo);
+p_vao_2buffers->add_buffer(*p_colors_vbo);
+
+//создаем окружение для 1 буфера 
+BufferLayout buffer_layout_2vec3
+{
+   ShaderDataType::Float3,
+   ShaderDataType::Float3
+};
+
+//vertex array для 1 буфера 
+p_vao_1buffer = std::make_unique<VertexArray>();
+
+//vertex буфер сразу для точек и цвета 
+p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors, sizeof(positions_colors), buffer_layout_2vec3);
+
+//добавляем буфер в vertex array
+p_vao_1buffer->add_buffer(*p_positions_colors_vbo);
+        
         //---------------------------------------------------------------------
 
 
@@ -214,13 +239,6 @@ namespace FirstEngine {
         glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);           //изменяем буфер цвета       
         glClear(GL_COLOR_BUFFER_BIT);       //рисуем 
 
-        //--------------------------работа с шейдерами-----------------------------    
-
-        p_shader_program->bind();   //выбираем текущую шейдерную программу для отрисовки
-        p_vao->bind();      //делаем vertex array текущим 
-        glDrawArrays(GL_TRIANGLES, 0, 3);   //команда отрисовки        
-
-        //------------------------------------------------------------------------
 
         ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
 
@@ -238,7 +256,35 @@ namespace FirstEngine {
         //выбор цвета фона
         ImGui::Begin("Background Color Window");                    //начало нового окна
         ImGui::ColorEdit4("Background Color", m_background_color);  //виджет изменения цвета
-        ImGui::End();                                               //закрытие окна
+       
+//--------------------------работа с шейдерами-----------------------------    
+
+ 
+//переменная для переключения
+static bool use_2_buffers = true;
+
+//кнопка 
+ImGui::Checkbox("2 Buffers", &use_2_buffers);
+//если 2 буфера 
+if (use_2_buffers)
+{
+   p_shader_program->bind();  //выбираем текущую шейдерную программу 
+   p_vao_2buffers->bind(); //текущая vertex array
+   glDrawArrays(GL_TRIANGLES, 0, 3); //рисуем 
+}
+else
+{
+  
+    //текущая шейдерная программа  
+    p_shader_program->bind();
+    //текущий vertex array
+    p_vao_1buffer->bind();
+    //рисуем 
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+       
+
+        //------------------------------------------------------------------------
+ ImGui::End();                                               //закрытие окна
 
         //рендер
         ImGui::Render();                                            //сохраняем данные для рендера
