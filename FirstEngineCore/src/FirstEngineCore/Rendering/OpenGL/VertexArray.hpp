@@ -1,6 +1,7 @@
 #pragma once
 
 #include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
 
 namespace FirstEngine{
     class VertexArray {
@@ -23,7 +24,9 @@ namespace FirstEngine{
 
 
         //привязываем буффер(vertex buffer object) к этому Vertex Array Object
-        void add_buffer(const VertexBuffer& vertex_buffer);
+        void add_vertex_buffer(const VertexBuffer& vertex_buffer);
+//устанавливаем один index buffer
+void set_index_buffer(const IndexBuffer& index_buffer);
 
         //делает текущим 
         void bind() const;
