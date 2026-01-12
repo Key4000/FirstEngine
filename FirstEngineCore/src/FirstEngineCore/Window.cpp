@@ -3,6 +3,7 @@
 #include "FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/VertexArray.hpp"
+#include "SimpleEngineCore/Rendering/OpenGL/IndexBuffer.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h> 
@@ -15,23 +16,19 @@
 namespace FirstEngine {
 
     static bool s_GLFW_initialized = false;
-
-    GLfloat points[] = {
-        0.0f,  0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-       -0.5f, -0.5f, 0.0f
+    
+    //vertex точек и цвета 
+    GLfloat positions_colors2[] = 
+    {
+       -0.5f, -0.5f, 0.0f,   1.0f, 1.0f, 0.0f,
+        0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 1.0f,
+       -0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 1.0f,
+        0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f
     };
-
-    GLfloat colors[] = {
-        1.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
-    };
-
-    GLfloat positions_colors[] = {
-        1.0f, 0.0f, 0.0f,   1.0f, 1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,   0.0f, 1.0f, 1.0f,
-        0.0f, 0.0f, 1.0f,    1.0f, 0.0f, 1.0f
+    
+    //индексы для index buffer
+    GLuint indices[] = {
+        0, 1, 2, 3, 2, 1
     };
 
     const char* vertex_shader =
@@ -55,41 +52,38 @@ namespace FirstEngine {
     //указатель на шейдерную программу
     std::unique_ptr<ShaderProgram> p_shader_program;
 
-    //указатели на 2 vertex buffer и vertex array 
-    std::unique_ptr<VertexBuffer> p_points_vbo;
-    std::unique_ptr<VertexBuffer> p_colors_vbo;
-    std::unique_ptr<VertexArray> p_vao_2buffer;
 
-    //указатели на 1 буфер и vertex array
+    //указатели vertex буфер 
     std::unique_ptr<VertexBuffer> p_positions_colors_vbo;
-    std::unique_ptr<VertexArray> p_vao_1buffer;
-    
-    
+    //index buffer
+    std::unique_ptr<IndexBuffer> p_index_buffer;
+    //vertex array
+    std::unique_ptr<VertexArray> p_vao;
 
     //конструктор окна
-	Window::Window(std::string title, const unsigned int width, const unsigned int height) 
+        Window::Window(std::string title, const unsigned int width, const unsigned int height) 
         :m_data({ std::move(title), width, height })
-	{
-		int resultCode = init();
+        {
+                int resultCode = init();
 
         //подключение ImGui
         IMGUI_CHECKVERSION();       //проверяем версию
-        
+
         ImGui::CreateContext();     //создаем контекст 
-        
+
         ImGui_ImplOpenGL3_Init();   //opengl для imgui
 
         ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true); //инициализируем бэкенд imgui для связки с glfw для openGl(можно и vulkan)
 
-	}
+        }
 
     //деструктор окна 
-	Window::~Window() {
-		shutdown();
-	}
+        Window::~Window() {
+                shutdown();
+        }
 
-	//инициализация окна
-	int Window::init() {
+        //инициализация окна
+        int Window::init() {
         LOG_INFO("Creating window `{0}` width size {1}x{2}", m_data.title, m_data.width, m_data.height);
 
         /* Initialize the library */
@@ -102,7 +96,7 @@ namespace FirstEngine {
             }
             s_GLFW_initialized = true;
         }
-        
+
 
         //создаем окно
         m_pWindow = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
@@ -143,7 +137,7 @@ namespace FirstEngine {
                 EventWindowResize event(width, height);
                 //вызываем наш колбэк
                 data.eventCallbackFn(event);
-                
+
             }
         );
 
@@ -190,26 +184,6 @@ namespace FirstEngine {
         };
 
         //передаем всю необходимую информацию о шейдерах в память видеокарты
-        
-        //создаем окружение для 2 буферов 
-BufferLayout buffer_layout_1vec3
-{
-  ShaderDataType::Float3
-};
-
-       //vertex array для 2 буферов
-       p_vao_2buffers = std::make_unique<VertexArray>(); 
-
-       //vertex буфер для точек 
-       p_points_vbo =    std::make_unique<VertexBuffer>(points, sizeof(points), buffer_layout_1vec3);  
-
-       //vertex буфер для цвета 
-       p_colors_vbo = std::make_unique<VertexBuffer>(colors, sizeof(colors), buffer_layout_1vec3);
-
-//добавляем 2 буфера в vertex array
-p_vao_2buffers->add_buffer(*p_points_vbo);
-p_vao_2buffers->add_buffer(*p_colors_vbo);
-
 //создаем окружение для 1 буфера 
 BufferLayout buffer_layout_2vec3
 {
@@ -218,20 +192,24 @@ BufferLayout buffer_layout_2vec3
 };
 
 //vertex array для 1 буфера 
-p_vao_1buffer = std::make_unique<VertexArray>();
+p_vao = std::make_unique<VertexArray>();
 
 //vertex буфер сразу для точек и цвета 
-p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors, sizeof(positions_colors), buffer_layout_2vec3);
+p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors2, sizeof(positions_colors2), buffer_layout_2vec3);
+//index buffer с несколькими буферами 
+p_index_buffer = std::make_unique<IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
 
 //добавляем буфер в vertex array
-p_vao_1buffer->add_buffer(*p_positions_colors_vbo);
-        
+p_vao->add_buffer(*p_positions_colors_vbo);
+//устанавливаем index buffer в vertex array
+p_vao->set_index_buffer(*p_index_buffer); 
+
         //---------------------------------------------------------------------
 
 
         return 0;
-        
-	}
+
+        }
 
     //изменение в окне , вся отрисовка тут
     void Window::on_update() {
@@ -256,34 +234,13 @@ p_vao_1buffer->add_buffer(*p_positions_colors_vbo);
         //выбор цвета фона
         ImGui::Begin("Background Color Window");                    //начало нового окна
         ImGui::ColorEdit4("Background Color", m_background_color);  //виджет изменения цвета
-       
+
 //--------------------------работа с шейдерами-----------------------------    
-
- 
-//переменная для переключения
-static bool use_2_buffers = true;
-
-//кнопка 
-ImGui::Checkbox("2 Buffers", &use_2_buffers);
-//если 2 буфера 
-if (use_2_buffers)
-{
    p_shader_program->bind();  //выбираем текущую шейдерную программу 
-   p_vao_2buffers->bind(); //текущая vertex array
-   glDrawArrays(GL_TRIANGLES, 0, 3); //рисуем 
-}
-else
-{
-  
-    //текущая шейдерная программа  
-    p_shader_program->bind();
-    //текущий vertex array
-    p_vao_1buffer->bind();
-    //рисуем 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-       
+   p_vao_->bind(); //текущая vertex array
+   glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(p_vao->get_indices_count()), GL_UNSIGNED_INT, nullptr); //рисуем 
 
-        //------------------------------------------------------------------------
+//------------------------------------------------------------------------
  ImGui::End();                                               //закрытие окна
 
         //рендер
@@ -298,10 +255,10 @@ else
         glfwPollEvents();
     }
 
-	//закрытие окна
-	void Window::shutdown() {
+        //закрытие окна
+        void Window::shutdown() {
 
         glfwDestroyWindow(m_pWindow);
         glfwTerminate();
-	}
+        }
 }
