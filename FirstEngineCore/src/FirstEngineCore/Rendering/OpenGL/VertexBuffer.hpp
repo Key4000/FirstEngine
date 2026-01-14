@@ -1,5 +1,9 @@
 #pragma once 
 
+#include <cinttypes>
+#include <initializer_list>
+#include <vector>
+
 namespace FirstEngine{
 
     enum class ShaderDataType
@@ -17,11 +21,12 @@ namespace FirstEngine{
     //класс окружения буффера
     struct BufferElement
     {
-        ShaderDataType type;
+        
         uint32_t component_type;
         size_t components_count;
         size_t size;
         size_t offset;
+        ShaderDataType type;
 
         BufferElement(const ShaderDataType type);
     };
@@ -45,9 +50,9 @@ namespace FirstEngine{
         }
 
         //получить эл-ты
-        const std::vector<BufferElement>& get_elements() const { return m_elements; }
+        const std::vector<BufferElement>&get_elements() const { return m_elements; };
         //получить страйд
-        size_t get_stride() const { return m_stride; }
+        size_t get_stride() const { return m_stride; };
 
     private:
         //вектор элементов 

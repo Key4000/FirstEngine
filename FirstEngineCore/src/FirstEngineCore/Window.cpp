@@ -3,7 +3,7 @@
 #include "FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/VertexArray.hpp"
-#include "SimpleEngineCore/Rendering/OpenGL/IndexBuffer.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h> 
@@ -200,7 +200,7 @@ p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors2, sizeo
 p_index_buffer = std::make_unique<IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
 
 //добавляем буфер в vertex array
-p_vao->add_buffer(*p_positions_colors_vbo);
+p_vao->add_vertex_buffer(*p_positions_colors_vbo);
 //устанавливаем index buffer в vertex array
 p_vao->set_index_buffer(*p_index_buffer); 
 
@@ -237,7 +237,7 @@ p_vao->set_index_buffer(*p_index_buffer);
 
 //--------------------------работа с шейдерами-----------------------------    
    p_shader_program->bind();  //выбираем текущую шейдерную программу 
-   p_vao_->bind(); //текущая vertex array
+   p_vao->bind(); //текущая vertex array
    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(p_vao->get_indices_count()), GL_UNSIGNED_INT, nullptr); //рисуем 
 
 //------------------------------------------------------------------------

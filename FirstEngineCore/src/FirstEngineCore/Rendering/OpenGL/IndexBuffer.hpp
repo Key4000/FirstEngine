@@ -1,37 +1,38 @@
 #pragma once
-#include "VertexBuffer.hpp"
 
-namespace SimpleEngine {
+#include "VertexBuffer.hpp";
 
- class IndexBuffer {
- public:
-    //
-    IndexBuffer(const void* data, const size_t count, const VertexBuffer::EUsage usage = VertexBuffer::EUsage::Static);
-    //
-    ~IndexBuffer();
-   
-    //СѓРґР°Р»СЏРµРј РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ РєРѕРїРёРїРѕРІР°РЅРёРµРј 
-    IndexBuffer(const IndexBuffer&) = delete;
-    //СѓРґР°Р»СЏРµРј РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёРµ СЃ РєРѕРїРёСЂРѕРІР°РЅРёРµРј 
-    IndexBuffer& operator=(const IndexBuffer&) = delete;
-    
-    //РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РёРІР°РЅРёСЏ СЃ РїРµСЂРµРјРµС‰РµРЅРёРµРј РЅРµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ
-    IndexBuffer& operator=(IndexBuffer&& index_buffer) noexcept;
-    //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ РїРµСЂРµРјРµС‰РµРЅРёРµРј РЅРµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ 
-    IndexBuffer(IndexBuffer&& index_buffer) noexcept;
+namespace FirstEngine {
 
-    //СЃРґРµР»Р°С‚СЊ С‚РµРєСѓС‰РёРј 
-    void bind() const;
-    //СѓР±СЂР°С‚СЊ РёР· С‚РµРєСѓС‰РµРіРѕ 
-    static void unbind();
-    //РїРѕР»СѓС‡РёС‚СЊ РєРѕР»-РІРѕ СЌР»-С‚РѕРІ РІ СЌС‚РѕРј Р±СѓС„РµСЂРµ(РІРµСЂС‚РµРєСЃРѕРІ)
-    size_t get_count() const { return m_count; }
+    class IndexBuffer {
+    public:
+        
+        IndexBuffer(const void* data, const size_t count, const VertexBuffer::EUsage usage = VertexBuffer::EUsage::Static);
+        
+        ~IndexBuffer();
 
-private:
-    //id Р±СѓС„РµСЂР° 
-    unsigned int m_id = 0;
-    //РєРѕР»-РІРѕ СЌР»-С‚РѕРІ РІ Р±СѓС„РµСЂРµ (СЃРєРѕР»СЊРєРѕ РІРµСЂС‚РµРєСЃРѕРІ)
-    size_t m_count;
- };
+        //удаляем конструктор с копипованием 
+        IndexBuffer(const IndexBuffer&) = delete;
+        //удаляем оператор присваивание с копированием 
+        IndexBuffer& operator=(const IndexBuffer&) = delete;
+
+        //оператор присваиваивания с перемещением не выбрасывает исключения
+        IndexBuffer& operator=(IndexBuffer&& index_buffer) noexcept;
+        //конструктор с перемещением не выбрасывает исключения 
+        IndexBuffer(IndexBuffer&& index_buffer) noexcept;
+
+        //сделать текущим 
+        void bind() const;
+        //убрать из текущего 
+        static void unbind();
+        //получить кол-во эл-тов в этом буфере(вертексов)
+        size_t get_count() const { return m_count; }
+
+    private:
+        //id буфера 
+        unsigned int m_id = 0;
+        //кол-во эл-тов в буфере (сколько вертексов)
+        size_t m_count;
+    };
 
 }

@@ -55,15 +55,16 @@ namespace FirstEngine{
             );
             ++m_elements_count;
         };
-
-        void  VertexArray::set_index_buffer(const IndexBuffer& index_buffer)
-       {
-           bind();
-           index_buffer.bind();
-           m_indices_count = index_buffer.get_count();
-       } 
-
     };
+
+    void  VertexArray::set_index_buffer(const IndexBuffer& index_buffer)
+    {
+        bind();
+        index_buffer.bind();
+        m_indices_count = index_buffer.get_count();
+    };
+
+    
     void VertexArray::bind() const
     {
         glBindVertexArray(m_id);   //сделать текущим 

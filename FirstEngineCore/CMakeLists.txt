@@ -16,7 +16,7 @@ set(ENGINE_PRIVATE_INCLUDES
     src/FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp
     src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp
     src/FirstEngineCore/Rendering/OpenGL/VertexArray.hpp
-src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp
+    src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp
 )
 
 #здесь хранятся все исходные коды 
@@ -26,23 +26,25 @@ set(ENGINE_PRIVATE_SOURCES
     src/FirstEngineCore/Rendering/OpenGL/ShaderProgram.cpp
     src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.cpp
     src/FirstEngineCore/Rendering/OpenGL/VertexArray.cpp
-src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.cpp
+    src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.cpp
 )
 
 #задаем переменную
 set(ENGINE_ALL_SOURCES
-    ${ENGINE_PUBLIC_INCLUDES}
-    ${ENGINE_PRIVATE_INCLUDES}
-    ${ENGINE_PRIVATE_SOURCES} 
-) 
+	${ENGINE_PUBLIC_INCLUDES}
+	${ENGINE_PRIVATE_INCLUDES}
+	${ENGINE_PRIVATE_SOURCES}
+)
 
 
 #создаем библиотеку
-add_library(${ENGINE_PROJECT_NAME} STATIC ${ENGINE_ALL_SOURCES}
+add_library(${ENGINE_PROJECT_NAME} STATIC
+	${ENGINE_ALL_SOURCES}
 )
 
 #структура в проекте такая же как в проводнике
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ENGINE_ALL_SOURCES}
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES 
+    ${ENGINE_ALL_SOURCES}
 ) 
 
 #подключение к линковке таргетов(внешние библиотеки)

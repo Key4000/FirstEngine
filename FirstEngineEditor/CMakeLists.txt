@@ -1,5 +1,6 @@
 #минимальная версия cmake
 cmake_minimum_required(VERSION 4.2.1)
+
 #устанавливаем имя 
 set(EDITOR_PROJECT_NAME FirstEngineEditor)
 
@@ -9,7 +10,10 @@ add_executable(${EDITOR_PROJECT_NAME}
 )
 
 #подключение к линковке таргетов(наша библиотека - движок)
-target_link_libraries(${EDITOR_PROJECT_NAME} FirstEngineCore)
+target_link_libraries(${EDITOR_PROJECT_NAME}
+	FirstEngineCore
+)
+
 #подключение с++17
 target_compile_features(${EDITOR_PROJECT_NAME} PUBLIC cxx_std_17)
 

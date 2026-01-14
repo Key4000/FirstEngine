@@ -1660,7 +1660,7 @@ typedef void (APIENTRYP PFNGLVIEWPORTPROC)(GLint x, GLint y, GLsizei width, GLsi
 GLAPI PFNGLVIEWPORTPROC glad_glViewport;
 #define glViewport glad_glViewport
 #endif
-#ifndef GL_VERSION_1_1
+#ifndef GL_VERSION_2_0
 #define GL_VERSION_1_1 1
 GLAPI int GLAD_GL_VERSION_1_1;
 typedef void (APIENTRYP PFNGLDRAWARRAYSPROC)(GLenum mode, GLint first, GLsizei count);

@@ -1,69 +1,69 @@
 #include "IndexBuffer.hpp"
 
-#include "SimpleEngineCore/Log.hpp"
+#include "FirstEngineCore/Log.hpp"
 
 #include <glad/glad.h>
 
-namespace SimpleEngine {
-  
-//РІС‹Р±РѕСЂ usage Р°Р±СЃС‚СЂР°РєС†РёСЏ, РґР»СЏ РІРѕР·РјРѕР¶РЅРѕР№ Р·Р°РјРµРЅС‹ API 
-constexpr GLenum usage_to_GLenum(const VertexBuffer::EUsage usage)
-{
+namespace FirstEngine {
+
+    //выбор usage абстракция, для возможной замены API 
+    constexpr GLenum usage_to_GLenum(const VertexBuffer::EUsage usage)
+    {
         switch (usage)
         {
-            case VertexBuffer::EUsage::Static:  return GL_STATIC_DRAW;
-            case VertexBuffer::EUsage::Dynamic: return GL_DYNAMIC_DRAW;
-            case VertexBuffer::EUsage::Stream:  return GL_STREAM_DRAW;
+        case VertexBuffer::EUsage::Static:  return GL_STATIC_DRAW;
+        case VertexBuffer::EUsage::Dynamic: return GL_DYNAMIC_DRAW;
+        case VertexBuffer::EUsage::Stream:  return GL_STREAM_DRAW;
         }
 
         LOG_ERROR("Unknown VertexBuffer usage");
         return GL_STREAM_DRAW;
-}
+    };
 
-//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ 
-IndexBuffer::IndexBuffer(const void* data, const size_t count, const VertexBuffer::EUsage usage)
+    //конструктор 
+    IndexBuffer::IndexBuffer(const void* data, const size_t count, const VertexBuffer::EUsage usage)
         : m_count(count)
-{
-   glGenBuffers(1, &m_id);
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
-   glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, usage_to_GLenum(usage));
-}
+    {
+        glGenBuffers(1, &m_id);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, usage_to_GLenum(usage));
+    };
 
-//РґРµСЃС‚СЂСѓРєС‚РѕСЂ
-IndexBuffer::~IndexBuffer()
-{
+    //деструктор
+    IndexBuffer::~IndexBuffer()
+    {
         glDeleteBuffers(1, &m_id);
-} 
+    };
 
-//РѕРїРµСЂР°С‚РѕСЂ РїСЂРёСЃРІР°РёРІР°РЅРёСЏ СЃ РїРµСЂРµРјРµС‰РµРЅРёРµРј РЅРµ РІС‹Р±СЂР°СЃС‹РІР°РµС‚ РёСЃРєР»СЋС‡РµРЅРёСЏ     
-IndexBuffer& IndexBuffer::operator=(IndexBuffer&& index_buffer) noexcept
-{
+    //оператор присваивания с перемещением не выбрасывает исключения     
+    IndexBuffer& IndexBuffer::operator=(IndexBuffer&& index_buffer) noexcept
+    {
         m_id = index_buffer.m_id;
         m_count = index_buffer.m_count;
         index_buffer.m_id = 0;
         index_buffer.m_count = 0;
         return *this;
-}
+    };
 
-//РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃ РїСЂРёСЃРІР°РёРІР°РЅРёРµРј
-IndexBuffer::IndexBuffer(IndexBuffer&& index_buffer) noexcept
+    //конструктор с присваиванием
+    IndexBuffer::IndexBuffer(IndexBuffer&& index_buffer) noexcept
         : m_id(index_buffer.m_id)
         , m_count(index_buffer.m_count)
     {
         index_buffer.m_id = 0;
         index_buffer.m_count = 0;
-    }
+    };
 
-//СЃРґРµР»Р°С‚СЊ С‚РµРєСѓС‰РёРј 
-void IndexBuffer::bind() const
- {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
-}
+    //сделать текущим 
+    void IndexBuffer::bind() const
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_id);
+    };
 
-//СѓР±СЂР°С‚СЊ РёР· С‚РµРєСѓС‰РµРіРѕ 
-void IndexBuffer::unbind()
-{
-   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
+    //убрать из текущего 
+    void IndexBuffer::unbind()
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    };
 
 }
