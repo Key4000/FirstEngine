@@ -19,15 +19,15 @@ namespace FirstEngine {
 
 		//запрещаем конструктор копирования и присваивания 
 		Window(const Window&) = delete;
-  //запрещаем конструктор перемещения 
+		//запрещаем конструктор перемещения 
 		Window(Window&&) = delete;
 		//запрещаем оператор присваивания и 
 		Window& operator=(const Window&) = delete;
-  //запрещаем оператор перемещения 
+		//запрещаем оператор перемещения 
 		Window& operator=(Window&&) = delete;
 		//потому что не должно быть возможности копировать приложение , приложение должно быть одно
 
-		
+
 		//функция будет вызываться каждый кадр 
 		//каждый кадр , который будет прорисовываться , будет вызывать внутри себя эту функцию
 		void on_update();
@@ -40,7 +40,7 @@ namespace FirstEngine {
 			m_data.eventCallbackFn = callback;
 		}
 
-	private: 
+	private:
 		//данные окна
 		struct WindowData {
 			std::string title;
@@ -61,7 +61,7 @@ namespace FirstEngine {
 		//сама переменная с данными
 		WindowData m_data;
 
-		float m_background_color[4] = {0.f, 0.f, 0.f, 0.f}; //для хранения цвета фона
+		float m_background_color[4] = { 0.f, 0.f, 0.f, 0.f }; //для хранения цвета фона
 
 	};
 }

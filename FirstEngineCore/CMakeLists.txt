@@ -66,10 +66,15 @@ add_subdirectory(../external/spdlog ${CMAKE_CURRENT_BINARY_DIR}/spdlog)
 #прилинкуем библиотеку к движку(приватно , чтобы editor при линковке не видел библиотеку(снаружи движка ничего не будет известно о библиотеке))
 target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE spdlog)
 
-#добавляем внешнюю библиотеку (как subdirectory) благодаря тому что в spdlog поддерживается cmake
+#добавляем внешнюю библиотеку (как subdirectory) благодаря тому что в glad поддерживается cmake
 add_subdirectory(../external/glad ${CMAKE_CURRENT_BINARY_DIR}/glad)
 #прилинкуем библиотеку к движку(приватно , чтобы editor при линковке не видел библиотеку(снаружи движка ничего не будет известно о библиотеке))
 target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE glad)
+
+#добавляем внешнюю библиотеку (как subdirectory) благодаря тому что в glm поддерживается cmake
+add_subdirectory(../external/glm ${CMAKE_CURRENT_BINARY_DIR}/glm)
+#прилинкуем библиотеку к движку(приватно , чтобы editor при линковке не видел библиотеку(снаружи движка ничего не будет известно о библиотеке))
+target_link_libraries(${ENGINE_PROJECT_NAME} PRIVATE glm)
 
 #---------добавляем руками библиотеку ImGui-----------
 

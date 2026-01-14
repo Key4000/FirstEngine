@@ -3,50 +3,50 @@
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
 
-namespace FirstEngine{
-    class VertexArray {
-    public:
-        //конструктор 
-        VertexArray();
-        //деструктор
-        ~VertexArray();
+namespace FirstEngine {
+	class VertexArray {
+	public:
+		//конструктор 
+		VertexArray();
+		//деструктор
+		~VertexArray();
 
-        //удаляем конструктор с копированием
-        VertexArray(const VertexArray&) = delete;
-        //удаляем оператор присваивания с копированием
-        VertexArray& operator=(const VertexArray&) = delete;
-
-
-        //оператор присваивания с перемещением не выбрасывает исключения 
-        VertexArray& operator=(VertexArray&& vertex_array) noexcept;
-        //конструктор с перемещением не выбрасывает исключений 
-        VertexArray(VertexArray&& vertex_array) noexcept;
+		//удаляем конструктор с копированием
+		VertexArray(const VertexArray&) = delete;
+		//удаляем оператор присваивания с копированием
+		VertexArray& operator=(const VertexArray&) = delete;
 
 
-        //привязываем буффер(vertex buffer object) к этому Vertex Array Object
-        void add_vertex_buffer(const VertexBuffer& vertex_buffer);
+		//оператор присваивания с перемещением не выбрасывает исключения 
+		VertexArray& operator=(VertexArray&& vertex_array) noexcept;
+		//конструктор с перемещением не выбрасывает исключений 
+		VertexArray(VertexArray&& vertex_array) noexcept;
 
-//устанавливаем один index buffer
-void set_index_buffer(const IndexBuffer& index_buffer);
 
-//получить кол-во буферов в index buffer
-size_t get_indices_count() const { return m_indices_count; }
+		//привязываем буффер(vertex buffer object) к этому Vertex Array Object
+		void add_vertex_buffer(const VertexBuffer& vertex_buffer);
 
-        //делает текущим 
-        void bind() const;
+		//устанавливаем один index buffer
+		void set_index_buffer(const IndexBuffer& index_buffer);
 
-        //убирает с текущего 
-        static void unbind();
+		//получить кол-во буферов в index buffer
+		size_t get_indices_count() const { return m_indices_count; }
 
-    private:
+		//делает текущим 
+		void bind() const;
 
-        //id для vertex array object 
-        unsigned int m_id = 0;
+		//убирает с текущего 
+		static void unbind();
 
-        //кол-во vbo
-        unsigned int m_elements_count = 0;
-    
-        //кол-во буферов index buffer 
-        size_t m_indices_count = 0;
-};
+	private:
+
+		//id для vertex array object 
+		unsigned int m_id = 0;
+
+		//кол-во vbo
+		unsigned int m_elements_count = 0;
+
+		//кол-во буферов index buffer 
+		size_t m_indices_count = 0;
+	};
 }
