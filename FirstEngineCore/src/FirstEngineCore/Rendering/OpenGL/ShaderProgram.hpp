@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/mat4x4.hpp
+
 namespace FirstEngine {
 	class ShaderProgram
 	{
@@ -26,6 +28,9 @@ namespace FirstEngine {
 		static void unbind();
 		//проверка на скомпилированность
 		bool isCompiled() const { return m_is_compiled; }
+  //установим матрицу 4х4 в шейдерную программу 
+  void setMatrix4(const char* name, const glm::mat4& matrix) const;
+
 	private:
 		bool m_is_compiled = false;
 		unsigned int m_id = 0;
