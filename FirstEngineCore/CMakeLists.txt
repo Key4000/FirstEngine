@@ -8,6 +8,7 @@ set(ENGINE_PUBLIC_INCLUDES
     includes/FirstEngineCore/Application.hpp
     includes/FirstEngineCore/Log.hpp
     includes/FirstEngineCore/Event.hpp
+    includes/FirstEngineCore/Camera.hpp
 )
 
 #здесь хранятся все приватные инклуды
@@ -23,6 +24,7 @@ set(ENGINE_PRIVATE_INCLUDES
 set(ENGINE_PRIVATE_SOURCES 
     src/FirstEngineCore/Application.cpp
     src/FirstEngineCore/Window.cpp
+    src/FirstEngineCore/Camera.cpp
     src/FirstEngineCore/Rendering/OpenGL/ShaderProgram.cpp
     src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.cpp
     src/FirstEngineCore/Rendering/OpenGL/VertexArray.cpp
