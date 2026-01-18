@@ -5,9 +5,9 @@
 #include "FirstEngineCore/Rendering/OpenGL/VertexArray.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp"
 #include "FirstEngineCore/Camera.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.hpp"
 
-#include <GLFW/glfw3.h>
-#include <glad/glad.h> 
+#include <GLFW/glfw3.h> 
 #include <gl/GL.h>
 
 #include <imgui/imgui.h>
@@ -18,8 +18,6 @@
 #include <glm/trigonometric.hpp>
 
 namespace FirstEngine {
-
-	static bool s_GLFW_initialized = false;
 
 	//vertex точек и цвета 
 	GLfloat positions_colors2[] =
@@ -36,7 +34,7 @@ namespace FirstEngine {
 	};
 
 	const char* vertex_shader =
-	R"(#version 460
+		R"(#version 460
            layout(location = 0) in vec3 vertex_position;
            layout(location = 1) in vec3 vertex_color;
            uniform mat4 model_matrix;  
@@ -50,7 +48,7 @@ namespace FirstEngine {
 
 
 	const char* fragment_shader =
-  R"(#version 460
+		R"(#version 460
            in vec3 color;
            out vec4 frag_color;
            void main() {
@@ -69,17 +67,17 @@ namespace FirstEngine {
 	//vertex array
 	std::unique_ptr<VertexArray> p_vao;
 
-  float scale[3] = { 1.f, 1.f, 1.f };
-  float rotate = 0.f;
-  float translate[3] = { 0.f, 0.f, 0.f };
-  //камера 
-  float camera_position[3] = { 0.f, 0.f, 1.f };
-  float camera_rotation[3] = { 0.f, 0.f, 0.f };
-  bool perspective_camera = false;
-  Camera camera;
-  //
+	float scale[3] = { 1.f, 1.f, 1.f };
+	float rotate = 0.f;
+	float translate[3] = { 0.f, 0.f, 0.f };
+	//камера 
+	float camera_position[3] = { 0.f, 0.f, 1.f };
+	float camera_rotation[3] = { 0.f, 0.f, 0.f };
+	bool perspective_camera = false;
+	Camera camera;
+	//
 
-	//конструктор окна
+	  //конструктор окна
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
 		:m_data({ std::move(title), width, height })
 	{
@@ -105,17 +103,17 @@ namespace FirstEngine {
 	int Window::init() {
 		LOG_INFO("Creating window `{0}` width size {1}x{2}", m_data.title, m_data.width, m_data.height);
 
-		/* Initialize the library */
-		//инициализируем glfw 
-		if (!s_GLFW_initialized) {
-			if (!glfwInit())
+		//ловим ошибки GLFW
+		glfwSetErrorCallback([](int error_code, const char* description)
 			{
-				LOG_CRITICAL("Can't initialize GLFW!")
-					return -1;
-			}
-			s_GLFW_initialized = true;
+				LOG_CRITICAL("GLFW error: {0}", description);
+			});
+		//инициализируем glfw 
+		if (!glfwInit())
+		{
+			LOG_CRITICAL("Can't initialize GLFW!");
+			return -1;
 		}
-
 
 		//создаем окно
 		m_pWindow = glfwCreateWindow(m_data.width, m_data.height, m_data.title.c_str(), nullptr, nullptr);
@@ -123,20 +121,16 @@ namespace FirstEngine {
 		if (!m_pWindow)
 		{
 			LOG_CRITICAL("Can't create window {0} width size {1}x{2}", m_data.title, m_data.width, m_data.height)
-				glfwTerminate();
-			return -2;
+				return -2;
 		}
 
-		/* Make the window's context current */
-		//создаем контекст окна
-		glfwMakeContextCurrent(m_pWindow);
-
-		//загружаем функции openGL с помощью GLAD
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+		//инициализируем GLFW
+		if (!Renderer_OpenGL::init(m_pWindow))
 		{
-			LOG_CRITICAL("Failed to initialize GLAD")
-				return -3;
+			LOG_CRITICAL("Failed to initialize OpenGL renderer");
+			return -3;
 		}
+
 		//оставляем ссылку на свои данные в хендле
 		glfwSetWindowUserPointer(m_pWindow, &m_data);
 
@@ -148,25 +142,20 @@ namespace FirstEngine {
 			{
 				//получаем данные из хендла
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
-
 				data.width = width;
 				data.height = height;
-
 				//пишем данные , чтобы отправить в наш ивент 
 				EventWindowResize event(width, height);
 				//вызываем наш колбэк
 				data.eventCallbackFn(event);
-
 			}
 		);
 
 		//ловим колбэк изменения позиции курсора 
 		glfwSetCursorPosCallback(m_pWindow,
 			[](GLFWwindow* pWindow, double x, double y) {
-
 				//получаем данные из хендла
 				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
-
 				//пишем данные , чтобы отправить в наш ивент 
 				EventMouseMoved event(x, y);
 				//вызываем наш колбэк
@@ -185,14 +174,13 @@ namespace FirstEngine {
 			}
 		);
 
-		//---------------------работа с шейдерами--------------------------
+		//---------------------------------работа с шейдерами--------------------------------------
 
 		//получение кол-ва пикселей (размер окна  для ретина-мониторов) 
 		glfwSetFramebufferSizeCallback(m_pWindow,
 			[](GLFWwindow* pWindow, int width, int height)
 			{
-				glViewport(0, 0, width, height);
-
+				Renderer_OpenGL::set_viewport(width, height);
 			}
 		);
 
@@ -225,30 +213,8 @@ namespace FirstEngine {
 
 		//---------------------------------------------------------------------
 
-		//-----------------------------здесь тестовый код----------------------------------
 
 
-		glm::mat3 mat_1(4, 0, 0, 2, 8, 1, 0, 1, 0);
-		glm::mat3 mat_2(4, 2, 9, 2, 0, 4, 1, 4, 2);
-
-		glm::mat3 result_mat = mat_1 * mat_2;
-
-		LOG_INFO("");
-		LOG_INFO("|{0:3} {1:3} {2:3}|", result_mat[0][0], result_mat[1][0], result_mat[2][0]);
-		LOG_INFO("|{0:3} {1:3} {2:3}|", result_mat[0][1], result_mat[1][1], result_mat[2][1]);
-		LOG_INFO("|{0:3} {1:3} {2:3}|", result_mat[0][2], result_mat[1][2], result_mat[2][2]);
-		LOG_INFO("");
-
-		glm::vec4 vec(1, 2, 3, 4);
-		glm::mat4 mat_identity(1);
-
-		glm::vec4 result_vec = mat_identity * vec;
-
-		LOG_INFO("({0} {1} {2} {3})", result_vec.x, result_vec.y, result_vec.z, result_vec.w);
-
-
-
-		//-----------------------------здесь тестовый код----------------------------------
 		return 0;
 
 	}
@@ -256,12 +222,10 @@ namespace FirstEngine {
 	//изменение в окне , вся отрисовка тут
 	void Window::on_update() {
 
-		glClearColor(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);           //изменяем буфер цвета       
-		glClear(GL_COLOR_BUFFER_BIT);       //рисуем 
-
+		Renderer_OpenGL::set_clear_color(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);		//изменяем буфер цвета       
+		Renderer_OpenGL::clear();       //рисуем 
 
 		ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
-
 		io.DisplaySize.x = static_cast<float>(get_width());    //указать размер окна по горизонтали , виджеты должны совпадать с этим размером
 		io.DisplaySize.y = static_cast<float>(get_height());   //указать размер окна по вертикали , виджеты должны совпадать с этим размером
 
@@ -271,74 +235,56 @@ namespace FirstEngine {
 		ImGui::NewFrame();              //кадр самого ImGui
 
 		//виджеты 
-		ImGui::ShowDemoWindow();        //демо
+		//ImGui::ShowDemoWindow();        //демо
+		ImGui::Begin("Background Color Window");									//начало нового окна
+		ImGui::ColorEdit4("Background Color", m_background_color);					//виджет изменения цвета
+		ImGui::SliderFloat3("scale", scale, 0.f, 2.f);								//увеличение
+		ImGui::SliderFloat("rotate", &rotate, 0.f, 360.f);							//поворот
+		ImGui::SliderFloat3("translate", translate, -1.f, 1.f);						//перемещение
+		ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f);		//позиция камеры
+		ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f);			//поворот камеры
+		ImGui::Checkbox("Perspective camera", &perspective_camera);					//перспектива
 
-		//выбор цвета фона
-		ImGui::Begin("Background Color Window");                    //начало нового окна
-		ImGui::ColorEdit4("Background Color", m_background_color);  //виджет изменения цвета
-		
-//---------------тестовый код-----------
-     ImGui::SliderFloat3("scale", scale, 0.f, 2.f);
-     
-     ImGui::SliderFloat("rotate", &rotate, 0.f, 360.f);
-     
-     ImGui::SliderFloat3("translate", translate, -1.f, 1.f);
-     //камера 
+		//----------------------------------------работа с шейдерами-------------------------------------------  
+		//выбираем текущую шейдерную программу 	
+		p_shader_program->bind();
+		//матрица трансформации размера
+		glm::mat4 scale_matrix(scale[0], 0,	       0,        0,
+							   0,		 scale[1], 0,        0,
+							   0,        0,        scale[2], 0,
+							   0,        0,        0,        1);
+		//поворот в радианах
+		float rotate_in_radians = glm::radians(rotate);
+		//матрица трансформации поворота
+		glm::mat4 rotate_matrix(cos(rotate_in_radians),	sin(rotate_in_radians),	0, 0,
+								-sin(rotate_in_radians),cos(rotate_in_radians),	0, 0,
+								0,						0,						1, 0,
+								0,						0,						0, 1);
 
-     ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f);
-        
-     ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f);
-     
-     ImGui::Checkbox("Perspective camera", &perspective_camera);
-//---------------тестовый код-----------
-                                       		//--------------------------работа с шейдерами-----------------------------    
-                                       		p_shader_program->bind();  //выбираем текущую шейдерную программу 
-//---------------тестовый код----------		
-//матрица трансформации размера
-glm::mat4 scale_matrix(scale[0], 0,        0,        0,
-                               0,        scale[1], 0,        0,
-                               0,        0,        scale[2], 0,
-                               0,        0,        0,        1);
-        //поворот в радианах
-        float rotate_in_radians = glm::radians(rotate);
-        //матрица трансформации поворота
-        glm::mat4 rotate_matrix( cos(rotate_in_radians), sin(rotate_in_radians), 0, 0,
-                                -sin(rotate_in_radians), cos(rotate_in_radians), 0, 0,
-                                 0,                      0,                      1, 0,
-                                 0,                      0,                      0, 1);
+		//матрица трансформации перемещения
+		glm::mat4 translate_matrix(1,			0,			 0,			   0,
+								   0,			1,			 0,			   0,
+								   0,			0,			 1,			   0,
+								   translate[0],translate[1],translate[2], 1);
+		//получаем модел матрикс
+		glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
+		//передаем матрицу модели в шейдерную программу
+		p_shader_program->setMatrix4("model_matrix", model_matrix);
+		//================================камера==============================
+		camera.set_position_rotation(glm::vec3(camera_position[0], camera_position[1], camera_position[2]),
+		glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
+		camera.set_projection_mode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
+		p_shader_program->setMatrix4("view_projection_matrix", camera.get_projection_matrix() * camera.get_view_matrix());
+		//=====================================================================
+		//----------------------------работа с шейдерами закончена--------------------------------------------
+		 
 
-        //матрица трансформации перемещения
-        glm::mat4 translate_matrix(1,            0,            0,            0,
-                                   0,            1,            0,            0,
-                                   0,            0,            1,            0,
-                                   translate[0], translate[1], translate[2], 1);
-        //
-        glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
-        //передаем матрицу модели в шейдерную программу
-        p_shader_program->setMatrix4("model_matrix", model_matrix);		
-//-------------------тестовый код----------
-
-  //_____камера_____ camera.set_position_rotation(glm::vec3(camera_position[0], camera_position[1], camera_position[2]),
-                                     glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
-        camera.set_projection_mode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
-        p_shader_program->setMatrix4("view_projection_matrix", camera.get_projection_matrix() * camera.get_view_matrix());
-//________
- 
-    p_vao->bind(); //текущая vertex array
-		
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(p_vao->get_indices_count()), GL_UNSIGNED_INT, nullptr); //рисуем 
-
-    
-
-		//------------------------------------------------------------------------
+		//----------------------------РЕНДЕР-----------------------------------
+		Renderer_OpenGL::draw(*p_vao);
 		ImGui::End();                                               //закрытие окна
-
 		//рендер
 		ImGui::Render();                                            //сохраняем данные для рендера
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным рендера
-
-
-
 		/* Swap front and back buffers */
 		glfwSwapBuffers(m_pWindow);
 		/* Poll for and process events */
@@ -347,8 +293,19 @@ glm::mat4 scale_matrix(scale[0], 0,        0,        0,
 
 	//закрытие окна
 	void Window::shutdown() {
-
+		//убираем контекст ImGui
+		if (ImGui::GetCurrentContext())
+		{
+			//удаляем OpenGL контекст в ImGui
+			ImGui_ImplOpenGL3_Shutdown();
+			//удаляем GLFW контекст в ImGui
+			ImGui_ImplGlfw_Shutdown();
+			//
+			ImGui::DestroyContext();
+		}
+		//удаляем GLFW окно
 		glfwDestroyWindow(m_pWindow);
+		//удаляем GLFW контекст
 		glfwTerminate();
 	}
 }

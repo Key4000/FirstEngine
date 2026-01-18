@@ -18,6 +18,7 @@ set(ENGINE_PRIVATE_INCLUDES
     src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp
     src/FirstEngineCore/Rendering/OpenGL/VertexArray.hpp
     src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp
+    src/FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.hpp
 )
 
 #здесь хранятся все исходные коды 
@@ -29,6 +30,7 @@ set(ENGINE_PRIVATE_SOURCES
     src/FirstEngineCore/Rendering/OpenGL/VertexBuffer.cpp
     src/FirstEngineCore/Rendering/OpenGL/VertexArray.cpp
     src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.cpp
+    src/FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.cpp
 )
 
 #задаем переменную
