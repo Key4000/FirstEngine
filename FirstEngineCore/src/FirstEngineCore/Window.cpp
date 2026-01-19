@@ -218,22 +218,9 @@ namespace FirstEngine {
 	void Window::on_update() {
 
 		Renderer_OpenGL::set_clear_color(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);		//изменяем буфер цвета       
-		Renderer_OpenGL::clear();       //рисуем 
+		Renderer_OpenGL::clear();       //рисуем  
 
-	
-
-		//виджеты 
-		//ImGui::ShowDemoWindow();        //демо
-		ImGui::Begin("Background Color Window");									//начало нового окна
-		ImGui::ColorEdit4("Background Color", m_background_color);					//виджет изменения цвета
-		ImGui::SliderFloat3("scale", scale, 0.f, 2.f);								//увеличение
-		ImGui::SliderFloat("rotate", &rotate, 0.f, 360.f);							//поворот
-		ImGui::SliderFloat3("translate", translate, -1.f, 1.f);						//перемещение
-		ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f);		//позиция камеры
-		ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f);			//поворот камеры
-		ImGui::Checkbox("Perspective camera", &perspective_camera);					//перспектива
-
-		//----------------------------------------работа с шейдерами-------------------------------------------  
+		//----------------------------------------ОТРИСОВКА ВСЕГО OpenGL-------------------------------------------  
 		//выбираем текущую шейдерную программу 	
 		p_shader_program->bind();
 		//матрица трансформации размера
@@ -264,21 +251,30 @@ namespace FirstEngine {
 		camera.set_projection_mode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
 		p_shader_program->setMatrix4("view_projection_matrix", camera.get_projection_matrix() * camera.get_view_matrix());
 		//=====================================================================
-		//----------------------------работа с шейдерами закончена--------------------------------------------
+		//----------------------------ОТРИСОВКА ВСЕГО OpenGL закончена--------------------------------------------
 		 
 
-		//----------------------------РЕНДЕР-----------------------------------
+		//----------------------------ОТРИСОВКА ИНТЕРФЕЙСА-----------------------------------
   //openGL рендер 
 		Renderer_OpenGL::draw(*p_vao);
   //начало рисовки UI
   UIModule::on_ui_draw_begin();
-		ImGui::End();                                               //закрытие окна
-		//рендер
-		ImGui::Render();                                            //сохраняем данные для рендера
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());     //рисуем(можно поменять на vulkan) по данным рендера
-		/* Swap front and back buffers */
+		
+//виджеты 
+  bool show = true;          UIModule::ShowExampleAppDockSpace(&show);
+		//ImGui::ShowDemoWindow();        //демо
+		ImGui::Begin("Background Color Window");									//начало нового окна
+		ImGui::ColorEdit4("Background Color", m_background_color);					//виджет изменения цвета
+		ImGui::SliderFloat3("scale", scale, 0.f, 2.f);								//увеличение
+		ImGui::SliderFloat("rotate", &rotate, 0.f, 360.f);							//поворот
+		ImGui::SliderFloat3("translate", translate, -1.f, 1.f);						//перемещение
+		ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f);		//позиция камеры
+		ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f);			//поворот камеры
+		ImGui::Checkbox("Perspective camera", &perspective_camera);					//перспектива                ImGui::End();                                               //закрытие окна
+UIModule::on_ui_draw_end()
+		//меняем front and back buffer
 		glfwSwapBuffers(m_pWindow);
-		/* Poll for and process events */
+  //
 		glfwPollEvents();
 	}
 
