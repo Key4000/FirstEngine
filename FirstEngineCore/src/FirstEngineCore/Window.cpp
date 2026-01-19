@@ -6,6 +6,7 @@
 #include "FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp"
 #include "FirstEngineCore/Camera.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.hpp"
+#include "FirstEngineCore/Modules/UIModule.hpp"
 
 #include <GLFW/glfw3.h> 
 #include <gl/GL.h>
@@ -82,15 +83,6 @@ namespace FirstEngine {
 		:m_data({ std::move(title), width, height })
 	{
 		int resultCode = init();
-
-		//подключение ImGui
-		IMGUI_CHECKVERSION();       //проверяем версию
-
-		ImGui::CreateContext();     //создаем контекст 
-
-		ImGui_ImplOpenGL3_Init();   //opengl для imgui
-
-		ImGui_ImplGlfw_InitForOpenGL(m_pWindow, true); //инициализируем бэкенд imgui для связки с glfw для openGl(можно и vulkan)
 
 	}
 
@@ -184,6 +176,9 @@ namespace FirstEngine {
 			}
 		);
 
+  //при создании окна 
+  UIModule::on_window_create(m_pWindow);
+
 		p_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
 		if (!p_shader_program->isCompiled())
 		{
@@ -225,9 +220,8 @@ namespace FirstEngine {
 		Renderer_OpenGL::set_clear_color(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);		//изменяем буфер цвета       
 		Renderer_OpenGL::clear();       //рисуем 
 
-		ImGuiIO& io = ImGui::GetIO();       //хендл  ввода вывода
-		io.DisplaySize.x = static_cast<float>(get_width());    //указать размер окна по горизонтали , виджеты должны совпадать с этим размером
-		io.DisplaySize.y = static_cast<float>(get_height());   //указать размер окна по вертикали , виджеты должны совпадать с этим размером
+	
+
 
 		//создание фрейма где мы будем рисовать
 		ImGui_ImplOpenGL3_NewFrame();   //кадр для openGL
