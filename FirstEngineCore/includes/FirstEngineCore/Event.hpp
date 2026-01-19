@@ -6,15 +6,14 @@
 #include <array>
 
 namespace FirstEngine {
+    //РїРµСЂРµС‡РёСЃР»РµРЅРёСЏ С‚РёРїРѕРІ СЃРѕР±С‹С‚РёР№
     enum class EventType {
         WindowResize = 0,
         WindowClose,
-
-        //клавиша нажата и отпущена 
+ 
         KeyPressed,
         KeyReleased,
 
-        //мышка нажата и отпущена + движение 
         MouseButtonPressed,
         MouseButtonReleased,
         MouseMoved,
@@ -22,13 +21,13 @@ namespace FirstEngine {
         EventsCount
     };
 
-    //базовый класс 
     struct BaseEvent
     {
         virtual ~BaseEvent() = default;
         virtual EventType get_type() const = 0;
     };
-
+   
+    //РєР»Р°СЃСЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№
     class EventDispatcher { 
     public:
         template<typename EventType>
@@ -55,8 +54,9 @@ namespace FirstEngine {
     private:
         std::array<std::function<void(BaseEvent&)>, static_cast<size_t>(EventType::EventsCount)> m_eventCallbacks;
     };
+ 
 
-    //при изменении позиции курсора 
+    //РґР°Р»РµРµ РЅР°СЃР»РµРґСѓРµРјС‹Рµ РєР»Р°СЃСЃС‹ РѕС‚ Р±Р°Р·РѕРІРѕРіРѕ 
     struct EventMouseMoved : public BaseEvent
     {
         EventMouseMoved(const double new_x, const double new_y) :
@@ -76,7 +76,7 @@ namespace FirstEngine {
         static const EventType type = EventType::MouseMoved;
     };
 
-    //при изменении размера окна 
+    
     struct EventWindowResize : public BaseEvent
     {
         EventWindowResize(const unsigned int new_width, const unsigned int new_height) :
@@ -96,7 +96,6 @@ namespace FirstEngine {
         static const EventType type = EventType::WindowResize;
     };
 
-    //событие закрытия окна
     struct EventWindowClose : public BaseEvent
     {
         virtual EventType get_type() const override
