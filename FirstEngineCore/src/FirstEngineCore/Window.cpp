@@ -287,16 +287,8 @@ namespace FirstEngine {
 
 	//закрытие окна
 	void Window::shutdown() {
-		//убираем контекст ImGui
-		if (ImGui::GetCurrentContext())
-		{
-			//удаляем OpenGL контекст в ImGui
-			ImGui_ImplOpenGL3_Shutdown();
-			//удаляем GLFW контекст в ImGui
-			ImGui_ImplGlfw_Shutdown();
-			//
-			ImGui::DestroyContext();
-		}
+  //при закрытии окна 
+  UIModule::on_window_close();
 		//удаляем GLFW окно
 		glfwDestroyWindow(m_pWindow);
 		//удаляем GLFW контекст
