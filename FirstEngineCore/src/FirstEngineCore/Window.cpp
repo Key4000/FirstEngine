@@ -222,12 +222,6 @@ namespace FirstEngine {
 
 	
 
-
-		//создание фрейма где мы будем рисовать
-		ImGui_ImplOpenGL3_NewFrame();   //кадр для openGL
-		ImGui_ImplGlfw_NewFrame();      //кадр для glfw
-		ImGui::NewFrame();              //кадр самого ImGui
-
 		//виджеты 
 		//ImGui::ShowDemoWindow();        //демо
 		ImGui::Begin("Background Color Window");									//начало нового окна
@@ -274,7 +268,10 @@ namespace FirstEngine {
 		 
 
 		//----------------------------РЕНДЕР-----------------------------------
+  //openGL рендер 
 		Renderer_OpenGL::draw(*p_vao);
+  //начало рисовки UI
+  UIModule::on_ui_draw_begin();
 		ImGui::End();                                               //закрытие окна
 		//рендер
 		ImGui::Render();                                            //сохраняем данные для рендера
