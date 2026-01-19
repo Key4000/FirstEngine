@@ -71,12 +71,7 @@ namespace FirstEngine {
 	float scale[3] = { 1.f, 1.f, 1.f };
 	float rotate = 0.f;
 	float translate[3] = { 0.f, 0.f, 0.f };
-	//камера 
-	float camera_position[3] = { 0.f, 0.f, 1.f };
-	float camera_rotation[3] = { 0.f, 0.f, 0.f };
-	bool perspective_camera = false;
-	Camera camera;
-
+    float m_background_color[4] = { 0.f, 0.f, 0.f, 0.f }; //для хранения цвета фона
 //
 
 	Application::Application() {
