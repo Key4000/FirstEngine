@@ -2,6 +2,19 @@
 #include "FirstEngineCore/Log.hpp"
 #include "FirstEngineCore/Window.hpp"
 #include "FirstEngineCore/Event.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/ShaderProgram.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/VertexBuffer.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/VertexArray.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/IndexBuffer.hpp"
+#include "FirstEngineCore/Camera.hpp"
+#include "FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.hpp"
+#include "FirstEngineCore/Modules/UIModule.hpp"
+
+#include <imgui/imgui.h>
+#include <glm/mat3x3.hpp>
+#include <glm/trigonometric.hpp>
+#include <GLFW/glfw3.h>
+
 
 #include <iostream>
 
@@ -108,6 +121,36 @@ namespace FirstEngine {
 		);
 		//-----------------------------------------------------------------------------
 
+        //-----------------------------------------------------------------------------
+		//РАБОТА С ШЕЙДЕРАМИ
+        p_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
+		if (!p_shader_program->isCompiled())
+		{
+			return false;
+		};
+
+		//передаем всю необходимую информацию о шейдерах в память видеокарты
+		//создаем окружение для 1 буфера 
+		BufferLayout buffer_layout_2vec3
+		{
+		   ShaderDataType::Float3,
+		   ShaderDataType::Float3
+		};
+
+		//vertex array для 1 буфера 
+		p_vao = std::make_unique<VertexArray>();
+
+		//vertex буфер сразу для точек и цвета 
+		p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors2, sizeof(positions_colors2), buffer_layout_2vec3);
+		//index buffer с несколькими буферами 
+		p_index_buffer = std::make_unique<IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
+
+		//добавляем буфер в vertex array
+		p_vao->add_vertex_buffer(*p_positions_colors_vbo);
+		//устанавливаем index buffer в vertex array
+		p_vao->set_index_buffer(*p_index_buffer);
+		//---------------------------------------------------------------------  
+		   
 		//пока окно не закрыто цикл рендера работает
 		while (!m_bCloseWindow)
 		{
