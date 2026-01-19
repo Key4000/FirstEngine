@@ -2,7 +2,7 @@
 #include <memory>
 #include <FirstEngineCore/Application.hpp>
 
-class MyApp : public FirstEngine::Application
+class FirstEngineEditor : public FirstEngine::Application
 {
 	virtual void on_update()  override
 	{
@@ -14,9 +14,9 @@ class MyApp : public FirstEngine::Application
 
 int main()
 {
-	auto myApp = std::make_unique<MyApp>();
+	auto pFirstEngineEditor = std::make_unique<FirstEngineEditor>();
 
-	int returnCode = myApp->start(1024, 768, "MyApp");
+	int returnCode = pFirstEngineEditor->start(1024, 768, "FirstEngine Editor");
 
 	std::cin.get();
 
