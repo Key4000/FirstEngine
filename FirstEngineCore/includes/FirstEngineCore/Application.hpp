@@ -1,7 +1,7 @@
 #pragma once
 
 #include "FirstEngineCore/Event.hpp"
-#include "SimpleEngineCore/Camera.hpp"
+#include "FirstEngineCore/Camera.hpp"
 
 #include <memory>
 
