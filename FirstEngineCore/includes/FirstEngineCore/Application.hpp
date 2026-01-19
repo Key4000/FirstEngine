@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FirstEngineCore/Event.hpp"
+#include "SimpleEngineCore/Camera.hpp"
 
 #include <memory>
 
@@ -11,25 +12,28 @@ namespace FirstEngine {
 		Application();
 		virtual ~Application();
 
-		//запрещаем конструкторы(потому что класс виртуальный)
 		Application(const Application&) = delete;
 		Application(Application&&) = delete;
 		Application& operator=(const Application&) = delete;
 		Application& operator=(Application&&) = delete;
-		//потому что не должно быть возможности копировать приложение , приложение должно быть одно
-
-		//функция старта (ширина окна, высота окна, название окна)
+		
 		virtual int start(unsigned int window_width, unsigned int window_height, const char* title);
 
-		//функция будет вызываться каждый кадр 
-		//каждый кадр , который будет прорисовываться , будет вызывать внутри себя эту функцию
 		virtual void on_update(){}
 
-	private:
-		//хендл окна
-		std::unique_ptr<class Window> m_pWindow;
+  //РєР°РјРµСЂР° 
+  virtual void on_ui_draw() {}
 
-		//будет содержать все колбэки по конкретному типу ивента
+  float camera_position[3] = { 0.f, 0.f, 1.f };
+  float camera_rotation[3] = { 0.f, 0.f, 0.f };
+  bool perspective_camera = false;
+  Camera camera;
+
+	private:
+	 //СЃСЃС‹Р»РєР° РЅР° РѕРєРЅРѕ 
+		std::unique_ptr<class Window> m_pWindow;
+  
+  //РєР»Р°СЃСЃ РѕР±СЂР°Р±РѕС‚С‡РёРєР° СЃРѕР±С‹С‚РёР№ 
 		EventDispatcher m_event_dispatcher;
 		bool m_bCloseWindow = false;
 	};
