@@ -108,8 +108,6 @@ namespace FirstEngine {
 			}
 		);
 
-		//---------------------------------работа с шейдерами--------------------------------------
-
 		//получение кол-ва пикселей (размер окна  для ретина-мониторов) 
 		glfwSetFramebufferSizeCallback(m_pWindow,
 			[](GLFWwindow* pWindow, int width, int height)
@@ -118,38 +116,10 @@ namespace FirstEngine {
 			}
 		);
 
-  //при создании окна 
-  UIModule::on_window_create(m_pWindow);
+		//--------------------------------------------------------------
 
-		p_shader_program = std::make_unique<ShaderProgram>(vertex_shader, fragment_shader);
-		if (!p_shader_program->isCompiled())
-		{
-			return false;
-		};
-
-		//передаем всю необходимую информацию о шейдерах в память видеокарты
-		//создаем окружение для 1 буфера 
-		BufferLayout buffer_layout_2vec3
-		{
-		   ShaderDataType::Float3,
-		   ShaderDataType::Float3
-		};
-
-		//vertex array для 1 буфера 
-		p_vao = std::make_unique<VertexArray>();
-
-		//vertex буфер сразу для точек и цвета 
-		p_positions_colors_vbo = std::make_unique<VertexBuffer>(positions_colors2, sizeof(positions_colors2), buffer_layout_2vec3);
-		//index buffer с несколькими буферами 
-		p_index_buffer = std::make_unique<IndexBuffer>(indices, sizeof(indices) / sizeof(GLuint));
-
-		//добавляем буфер в vertex array
-		p_vao->add_vertex_buffer(*p_positions_colors_vbo);
-		//устанавливаем index buffer в vertex array
-		p_vao->set_index_buffer(*p_index_buffer);
-
-		//---------------------------------------------------------------------
-
+        //при создании окна 
+        UIModule::on_window_create(m_pWindow);
 
 
 		return 0;
