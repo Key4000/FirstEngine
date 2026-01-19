@@ -154,6 +154,61 @@ namespace FirstEngine {
 		//пока окно не закрыто цикл рендера работает
 		while (!m_bCloseWindow)
 		{
+		Renderer_OpenGL::set_clear_color(m_background_color[0], m_background_color[1], m_background_color[2], m_background_color[3]);		//изменяем буфер цвета       
+		Renderer_OpenGL::clear();       //рисуем  
+
+		//----------------------------------------ОТРИСОВКА ВСЕГО OpenGL-------------------------------------------  
+		//выбираем текущую шейдерную программу 	
+		p_shader_program->bind();
+		//матрица трансформации размера
+		glm::mat4 scale_matrix(scale[0], 0,	       0,        0,
+							   0,		 scale[1], 0,        0,
+							   0,        0,        scale[2], 0,
+							   0,        0,        0,        1);
+		//поворот в радианах
+		float rotate_in_radians = glm::radians(rotate);
+		//матрица трансформации поворота
+		glm::mat4 rotate_matrix(cos(rotate_in_radians),	sin(rotate_in_radians),	0, 0,
+								-sin(rotate_in_radians),cos(rotate_in_radians),	0, 0,
+								0,						0,						1, 0,
+								0,						0,						0, 1);
+
+		//матрица трансформации перемещения
+		glm::mat4 translate_matrix(1,			0,			 0,			   0,
+								   0,			1,			 0,			   0,
+								   0,			0,			 1,			   0,
+								   translate[0],translate[1],translate[2], 1);
+		//получаем модел матрикс
+		glm::mat4 model_matrix = translate_matrix * rotate_matrix * scale_matrix;
+		//передаем матрицу модели в шейдерную программу
+		p_shader_program->setMatrix4("model_matrix", model_matrix);
+		//================================камера==============================
+		camera.set_position_rotation(glm::vec3(camera_position[0], camera_position[1], camera_position[2]),
+		glm::vec3(camera_rotation[0], camera_rotation[1], camera_rotation[2]));
+		camera.set_projection_mode(perspective_camera ? Camera::ProjectionMode::Perspective : Camera::ProjectionMode::Orthographic);
+		p_shader_program->setMatrix4("view_projection_matrix", camera.get_projection_matrix() * camera.get_view_matrix());
+		//=====================================================================
+		//----------------------------ОТРИСОВКА ВСЕГО OpenGL закончена--------------------------------------------
+		 
+
+		//----------------------------ОТРИСОВКА ИНТЕРФЕЙСА-----------------------------------
+  //openGL рендер 
+		Renderer_OpenGL::draw(*p_vao);
+  //начало рисовки UI
+  UIModule::on_ui_draw_begin();
+		
+//виджеты 
+  bool show = true;          UIModule::ShowExampleAppDockSpace(&show);
+		//ImGui::ShowDemoWindow();        //демо
+		ImGui::Begin("Background Color Window");									//начало нового окна
+		ImGui::ColorEdit4("Background Color", m_background_color);					//виджет изменения цвета
+		ImGui::SliderFloat3("scale", scale, 0.f, 2.f);								//увеличение
+		ImGui::SliderFloat("rotate", &rotate, 0.f, 360.f);							//поворот
+		ImGui::SliderFloat3("translate", translate, -1.f, 1.f);						//перемещение
+		ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f);		//позиция камеры
+		ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f);			//поворот камеры
+		ImGui::Checkbox("Perspective camera", &perspective_camera);					//перспектива                ImGui::End();                                               //закрытие окна
+UIModule::on_ui_draw_end()
 			m_pWindow->on_update();
 			on_update();
 		}
