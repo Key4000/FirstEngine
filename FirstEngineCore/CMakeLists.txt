@@ -9,6 +9,8 @@ set(ENGINE_PUBLIC_INCLUDES
     includes/FirstEngineCore/Log.hpp
     includes/FirstEngineCore/Event.hpp
     includes/FirstEngineCore/Camera.hpp
+    includes/FirstEngineCore/Keys.hpp
+    includes/FirstEngineCore/Input.hpp
 )
 
 #здесь хранятся все приватные инклуды
@@ -33,6 +35,7 @@ set(ENGINE_PRIVATE_SOURCES
     src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.cpp
     src/FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.cpp
     src/FirstEngineCore/Modules/UIModule.hpp
+	src/FirstEngineCore/Input.cpp
 )
 
 #задаем переменную
