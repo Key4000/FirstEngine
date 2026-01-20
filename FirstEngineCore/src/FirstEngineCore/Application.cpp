@@ -202,10 +202,14 @@ namespace FirstEngine {
 		ImGui::SliderFloat3("translate", translate, -1.f, 1.f);						//перемещение
 		ImGui::SliderFloat3("camera position", camera_position, -10.f, 10.f);		//позиция камеры
 		ImGui::SliderFloat3("camera rotation", camera_rotation, 0, 360.f);			//поворот камеры
-		ImGui::Checkbox("Perspective camera", &perspective_camera);					//перспектива                ImGui::End();                                               //закрытие окна
-UIModule::on_ui_draw_end()
-			m_pWindow->on_update();
-			on_update();
+		ImGui::Checkbox("Perspective camera", &perspective_camera);					//перспектива                	
+		ImGui::End();                                               //закрытие окна
+		//кастомный ui из Editor
+		on_ui_draw();
+			
+        UIModule::on_ui_draw_end()
+        m_pWindow->on_update();
+	    on_update();
 		}
 		//автоматически вызываем деструктор окна 
 		m_pWindow = nullptr;
