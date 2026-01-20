@@ -9,6 +9,7 @@
 #include "FirstEngineCore/Camera.hpp"
 #include "FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.hpp"
 #include "FirstEngineCore/Modules/UIModule.hpp"
+#include "FirstEngineCore/Input.hpp"
 
 #include <imgui/imgui.h>
 #include <glm/mat3x3.hpp>
@@ -105,6 +106,35 @@ namespace FirstEngine {
 				LOG_INFO("[WindowClose]");
 				m_bCloseWindow = true;
 			});
+
+		
+             //слушатель нажатия клавиши
+		        m_event_dispatcher.add_event_listener<EventKeyPressed>(
+            [&](EventKeyPressed& event)
+            {
+                if (event.key_code <= KeyCode::KEY_Z)
+                {
+                    if (event.repeated)
+                    {
+                        LOG_INFO("[Key pressed: {0}, repeated", static_cast<char>(event.key_code));
+                    }
+                    else
+                    {
+                        LOG_INFO("[Key pressed: {0}", static_cast<char>(event.key_code));
+                    }
+                }
+                Input::PressKey(event.key_code);
+            });
+        //слушатель отжима кнопки
+        m_event_dispatcher.add_event_listener<EventKeyReleased>(
+            [&](EventKeyReleased& event)
+            {
+                if (event.key_code <= KeyCode::KEY_Z)
+                {
+                    LOG_INFO("[Key released: {0}", static_cast<char>(event.key_code));
+                }
+                Input::ReleaseKey(event.key_code);
+            });
 
 		//вызывается каждый раз когда приходит какой то ивент от хендла окна
 		m_pWindow->set_event_callback(
