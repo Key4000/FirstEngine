@@ -2,7 +2,7 @@
 
 #include "Keys.hpp"
 
-namespace SimpleEngine {
+namespace FirstEngine {
 
     class Input {
     public:
