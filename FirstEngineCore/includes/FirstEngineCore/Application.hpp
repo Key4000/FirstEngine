@@ -21,9 +21,10 @@ namespace FirstEngine {
 
 		virtual void on_update(){}
 
-  //камера 
+  //кастомный ui, для задания его в Editor
   virtual void on_ui_draw() {}
 
+  //камера
   float camera_position[3] = { 0.f, 0.f, 1.f };
   float camera_rotation[3] = { 0.f, 0.f, 0.f };
   bool perspective_camera = false;
