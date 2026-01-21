@@ -43,7 +43,7 @@ namespace FirstEngine {
 		void update_projection_matrix();
 		//позиция, поворот 
 		glm::vec3 m_position;
-		glm::vec3 m_rotation;
+		glm::vec3 m_rotation;        //X - Roll, Y - Pitch, Z - Yaw 
 
         //векторы для движения по обзору камеры 
         glm::vec3 m_direction;
