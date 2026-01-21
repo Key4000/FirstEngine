@@ -49,6 +49,12 @@ namespace FirstEngine {
         glm::vec3 m_direction;
         glm::vec3 m_right;
         glm::vec3 m_up;
+ 
+
+        //неизменяемые координаты мира 
+        static constexpr glm::vec3 s_world_up{0.f, 0.f, 1.f};
+        static constexpr glm::vec3 s_world_right{0.f, -1.f, 0.f};
+        static constexpr glm::vec3 s_world_forward{1.f, 0.f, 0.f};
 
 		//способ проекции 
 		ProjectionMode m_projection_mode;
