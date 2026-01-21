@@ -21,43 +21,34 @@ namespace FirstEngine {
 	//обновить матрицу камеры 
 	void Camera::update_view_matrix()
 	{
+		//значения поворота камеры по обзору
+		const float roll_in_radians = glm::radians(m_rotations.x);
+		const float pitch_in_radians = glm::radians(m_rotations.y);
+        const float yaw_in_radians = glm::radians(m_rotations.z);		
 
-		//угол в радианах по x
-		float rotate_in_radians_x = glm::radians(-m_rotation.x);
 		//матрица поворота по x 
-		glm::mat4 rotate_matrix_x(
+		const glm::mat4 rotate_matrix_x(
 			1, 0, 0, 0,
-			0, cos(rotate_in_radians_x), sin(rotate_in_radians_x), 0,
-			0, -sin(rotate_in_radians_x), cos(rotate_in_radians_x), 0,
+			0, cos(roll_in_radians), sin(roll_in_radians), 0,
+			0, -sin(roll_in_radians), cos(roll_in_radians), 0,
 			0, 0, 0, 1);
 
-
-		//угол в радианах по y 
-		float rotate_in_radians_y = glm::radians(-m_rotation.y);
 		//матрица поворота по y
-		glm::mat4 rotate_matrix_y(
-			cos(rotate_in_radians_y), 0, -sin(rotate_in_radians_y), 0,
+		const glm::mat4 rotate_matrix_y(
+			cos(pitch_in_radians), 0, -sin(pitch_in_radians), 0,
 			0, 1, 0, 0,
-			sin(rotate_in_radians_y), 0, cos(rotate_in_radians_y), 0,
+			sin(pitch_in_radians), 0, cos(pitch_in_radians), 0,
 			0, 0, 0, 1);
 
-
-		//угол поворота в радианах по z
-		float rotate_in_radians_z = glm::radians(-m_rotation.z);
 		//матрица поворота по z 
-		glm::mat4 rotate_matrix(
-			cos(rotate_in_radians_z), sin(rotate_in_radians_z), 0, 0,
-			-sin(rotate_in_radians_z), cos(rotate_in_radians_z), 0, 0,
+		const glm::mat4 rotate_matrix_z(
+			cos(yaw_in_radians), sin(yaw_in_radians), 0, 0,
+			-sin(yaw_in_radians), cos(yaw_in_radians), 0, 0,
 			0, 0, 1, 0,
 			0, 0, 0, 1);
-
-
-		//матрица перемещения 
-		glm::mat4 translate_matrix(
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 1, 0,
-			-m_position[0], -m_position[1], -m_position[2], 1);
+		
+        //матрица Эйлера (соединение всех поворотов в один)(порядок важен, справа налево!)
+		const glm::mat4 euler_rotate_matrix = rotate_matrix_z * rotate_matrix_y * rotate_matrix_x;
 
 		m_view_matrix = rotate_matrix_y * rotate_matrix_x * translate_matrix;
 	}
