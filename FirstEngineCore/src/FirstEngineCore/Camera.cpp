@@ -120,4 +120,21 @@ namespace FirstEngine {
 		m_projection_mode = projection_mode;
 		update_projection_matrix();
 	}
+
+    //движение вперед по обзору 
+    void Camera::move_forward(const float delta) 
+    {
+         m_position += m_direction * delta;
+	}
+
+    //движение в бок по обзору 
+    void Camera::move_right(const float delta) 
+    {
+         m_position += m_right * delta;
+    }  
+    //движение вверх по обзору 
+    void Camera::move_up(const float delta) 
+    {
+         m_position += m_up * delta;
+    } 
 }
