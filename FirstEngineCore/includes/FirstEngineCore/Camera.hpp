@@ -29,6 +29,13 @@ namespace FirstEngine {
 		//взять проекцию 
 		glm::mat4 get_projection_matrix() const { return m_projection_matrix; }
 
+        //движение вперед по обзору 
+        void move_forward(const float delta);
+        //движение в бок по обзору 
+        void move_right(const float delta);
+        //движение вверх по обзору 
+        void move_up(const float delta);
+
 	private:
 		//обновить 
 		void update_view_matrix();
@@ -37,6 +44,12 @@ namespace FirstEngine {
 		//позиция, поворот 
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;
+
+        //векторы для движения по обзору камеры 
+        glm::vec3 m_direction;
+        glm::vec3 m_right;
+        glm::vec3 m_up;
+
 		//способ проекции 
 		ProjectionMode m_projection_mode;
 		//матрица перехода к камере 
