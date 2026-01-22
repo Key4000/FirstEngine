@@ -34,7 +34,7 @@ set(ENGINE_PRIVATE_SOURCES
     src/FirstEngineCore/Rendering/OpenGL/VertexArray.cpp
     src/FirstEngineCore/Rendering/OpenGL/IndexBuffer.cpp
     src/FirstEngineCore/Rendering/OpenGL/Renderer_OpenGL.cpp
-    src/FirstEngineCore/Modules/UIModule.hpp
+    src/FirstEngineCore/Modules/UIModule.cpp
 	src/FirstEngineCore/Input.cpp
 )
 

@@ -10,7 +10,7 @@ add_executable(${EDITOR_PROJECT_NAME}
 )
 
 #подключение к линковке таргетов(наша библиотека - движок)
-target_link_libraries(${EDITOR_PROJECT_NAME} FirstEngineCore  ImGui glm)
+target_link_libraries(${EDITOR_PROJECT_NAME} FirstEngineCore ImGui glm)
 
 #подключение с++17
 target_compile_features(${EDITOR_PROJECT_NAME} PUBLIC cxx_std_17)

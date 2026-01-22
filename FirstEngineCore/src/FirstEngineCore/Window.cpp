@@ -12,7 +12,7 @@
 
 namespace FirstEngine {
 
-	  //конструктор окна
+	//конструктор окна
 	Window::Window(std::string title, const unsigned int width, const unsigned int height)
 		:m_data({ std::move(title), width, height })
 	{
@@ -109,38 +109,38 @@ namespace FirstEngine {
 
 		//нажатие клавиши 
 		glfwSetKeyCallback(m_pWindow,
-            [](GLFWwindow* pWindow, int key, int scancode, int action, int mods)
-            {
-                WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
-                switch (action)
-                {
-                    case GLFW_PRESS:
-                    {
-                        EventKeyPressed event(static_cast<KeyCode>(key), false);
-                        data.eventCallbackFn(event);
-                        break;
-                    }
-                    case GLFW_RELEASE:
-                    {
-                        EventKeyReleased event(static_cast<KeyCode>(key));
-                        data.eventCallbackFn(event);
-                        break;
-                    }
-                    case GLFW_REPEAT:
-                    {
-                        EventKeyPressed event(static_cast<KeyCode>(key), true);
-                        data.eventCallbackFn(event);
-                        break;
-                    }
-                }
-            }
-        );
+			[](GLFWwindow* pWindow, int key, int scancode, int action, int mods)
+			{
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
+				switch (action)
+				{
+				case GLFW_PRESS:
+				{
+					EventKeyPressed event(static_cast<KeyCode>(key), false);
+					data.eventCallbackFn(event);
+					break;
+				}
+				case GLFW_RELEASE:
+				{
+					EventKeyReleased event(static_cast<KeyCode>(key));
+					data.eventCallbackFn(event);
+					break;
+				}
+				case GLFW_REPEAT:
+				{
+					EventKeyPressed event(static_cast<KeyCode>(key), true);
+					data.eventCallbackFn(event);
+					break;
+				}
+				}
+			}
+		);
 
 
 		//--------------------------------------------------------------
 
-        //при создании окна 
-        UIModule::on_window_create(m_pWindow);
+		//при создании окна 
+		UIModule::on_window_create(m_pWindow);
 
 
 		return 0;
@@ -151,14 +151,14 @@ namespace FirstEngine {
 	void Window::on_update() {
 		//меняем front and back buffer
 		glfwSwapBuffers(m_pWindow);
-        //
+		//
 		glfwPollEvents();
 	}
 
 	//закрытие окна
 	void Window::shutdown() {
-  //при закрытии окна 
-  UIModule::on_window_close();
+		//при закрытии окна 
+		UIModule::on_window_close();
 		//удаляем GLFW окно
 		glfwDestroyWindow(m_pWindow);
 		//удаляем GLFW контекст
