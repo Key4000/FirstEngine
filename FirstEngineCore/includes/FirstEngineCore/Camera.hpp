@@ -18,16 +18,16 @@ namespace FirstEngine {
 		Camera( const glm::vec3& position = { 0, 0, 0 },
 				const glm::vec3& rotation = { 0, 0, 0 },
 				const ProjectionMode projection_mode = ProjectionMode::Perspective);
-		//позиция, поворот 
+		//установить позицю, поворот 
 		void set_position(const glm::vec3& position);
 		void set_rotation(const glm::vec3& rotation);
 		void set_position_rotation(const glm::vec3& position, const glm::vec3& rotation);
 		//установка способа проекции
 		void set_projection_mode(const ProjectionMode projection_mode);
-		//взять матрицу камеры 
-		glm::mat4 get_view_matrix() const { return m_view_matrix; }
+		//отдать позицию камеры
+		const glm::mat4& get_view_matrix();
 		//взять проекцию 
-		glm::mat4 get_projection_matrix() const { return m_projection_matrix; }
+		const glm::mat4& get_projection_matrix() const { return m_projection_matrix; }
 
 		//движение вперед по обзору 
 		void move_forward(const float delta);
@@ -45,11 +45,11 @@ namespace FirstEngine {
 		void add_movement_and_rotation( const glm::vec3& movement_delta, const glm::vec3& rotation_delta);
 
 	private:
-		//обновить 
+		//обновить позицию камеры
 		void update_view_matrix();
-		//обновить 
+		//обновить проекцию камеры
 		void update_projection_matrix();
-		//позиция, поворот 
+		//векторы позиции, поворота 
 		glm::vec3 m_position;
 		glm::vec3 m_rotation;        //X - Roll, Y - Pitch, Z - Yaw 
 
@@ -66,9 +66,13 @@ namespace FirstEngine {
 
 		//способ проекции 
 		ProjectionMode m_projection_mode;
-		//матрица перехода к камере 
+
+		//матрица перехода к обзору с камеры 
 		glm::mat4 m_view_matrix;
-		//матрица добавления проекции 
+		//матрица проекции 
 		glm::mat4 m_projection_matrix;
+
+		//проверка обновлять ли позицию камеры
+		bool m_update_view_matrix = false;
 	};
 }

@@ -18,8 +18,18 @@ namespace FirstEngine {
 		//добавить проекцию 
 		update_projection_matrix();
 	}
+	
+	//отдать позицию камеры
+	const glm::mat4& Camera::get_view_matrix()
+	{
+		if (m_update_view_matrix) 
+		{
+			update_view_matrix();
+		}
+		return m_view_matrix;
+	}
 
-	//обновить матрицу камеры 
+	//обновить позицию камеры 
 	void Camera::update_view_matrix()
 	{
 		//значения поворота камеры по обзору
@@ -61,7 +71,7 @@ namespace FirstEngine {
 		m_view_matrix = glm::lookAt(m_position, m_position + m_direction, m_up);
 	}
 
-	//обновить матрицу проекции 
+	//обновить проекцию камеры
 	void Camera::update_projection_matrix()
 	{
 		if (m_projection_mode == ProjectionMode::Perspective)
@@ -90,18 +100,18 @@ namespace FirstEngine {
 		}
 	}
 
-	//позиция 
+	//установить позицю
 	void Camera::set_position(const glm::vec3& position)
 	{
 		m_position = position;
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 
 	//поворот
 	void Camera::set_rotation(const glm::vec3& rotation)
 	{
 		m_rotation = rotation;
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 
 	//позиция + поворот 
@@ -110,7 +120,7 @@ namespace FirstEngine {
 		m_position = position;
 		m_rotation = rotation;
 		//вызываем один раз, поэтому вынесли эту функцию отдельно 
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 
 	//проекция    
@@ -124,20 +134,20 @@ namespace FirstEngine {
 	void Camera::move_forward(const float delta)
 	{
 		m_position += m_direction * delta;
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 
 	//движение в бок по обзору 
 	void Camera::move_right(const float delta)
 	{
 		m_position += m_right * delta;
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 	//движение вверх по обзору 
 	void Camera::move_up(const float delta)
 	{
 		m_position += m_up * delta;
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 	void Camera::add_movement_and_rotation(const glm::vec3& movement_delta, const glm::vec3& rotation_delta)
 	{
@@ -147,6 +157,6 @@ namespace FirstEngine {
 		m_position += movement_delta.z * m_up;
 		//поворот
 		m_rotation += rotation_delta;
-		update_view_matrix();
+		m_update_view_matrix = true;
 	}
 }

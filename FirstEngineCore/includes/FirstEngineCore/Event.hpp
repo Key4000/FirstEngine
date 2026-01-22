@@ -7,6 +7,7 @@
 #include <array>
 
 namespace FirstEngine {
+
     //перечисления типов событий
     enum class EventType {
         WindowResize = 0,
@@ -22,6 +23,7 @@ namespace FirstEngine {
         EventsCount
     };
 
+    //базовый класс для наследования
     struct BaseEvent
     {
         virtual ~BaseEvent() = default;
@@ -56,8 +58,7 @@ namespace FirstEngine {
         std::array<std::function<void(BaseEvent&)>, static_cast<size_t>(EventType::EventsCount)> m_eventCallbacks;
     };
  
-
-    //далее наследуемые классы от базового 
+    //событие движения мышки
     struct EventMouseMoved : public BaseEvent
     {
         EventMouseMoved(const double new_x, const double new_y) :
@@ -77,7 +78,7 @@ namespace FirstEngine {
         static const EventType type = EventType::MouseMoved;
     };
 
-    
+    //события изменения окна
     struct EventWindowResize : public BaseEvent
     {
         EventWindowResize(const unsigned int new_width, const unsigned int new_height) :
@@ -96,7 +97,6 @@ namespace FirstEngine {
 
         static const EventType type = EventType::WindowResize;
     };
-
     struct EventWindowClose : public BaseEvent
     {
         virtual EventType get_type() const override
@@ -107,6 +107,7 @@ namespace FirstEngine {
         static const EventType type = EventType::WindowClose;
     };
 
+    //события нажатия клавиши
     struct EventKeyPressed : public BaseEvent
     {
         EventKeyPressed(const KeyCode key_code, const bool repeated)
@@ -125,7 +126,6 @@ namespace FirstEngine {
 
         static const EventType type = EventType::KeyPressed;
     };
-
     struct EventKeyReleased : public BaseEvent
     {
         EventKeyReleased(const KeyCode key_code)
@@ -141,5 +141,49 @@ namespace FirstEngine {
         KeyCode key_code;
 
         static const EventType type = EventType::KeyReleased;
+    };
+
+    //события нажатия мыши
+    struct EventMouseButtonPressed : public BaseEvent
+    {
+        EventMouseButtonPressed(const MouseButton mouse_button, const double x_pos, const double y_pos)
+            : mouse_button(mouse_button),
+            x_pos(x_pos),
+            y_pos(y_pos)
+        {
+        }
+        
+        virtual EventType get_type() const override
+        {
+            return type;
+        }
+        
+        MouseButton mouse_button;
+        double x_pos;
+        double y_pos;
+
+        static const EventType type = EventType::MouseButtonPressed;
+    };
+
+    struct EventMouseButtonReleased : public BaseEvent
+    {
+        
+        EventMouseButtonReleased(const MouseButton mouse_button, const double x_pos, const double y_pos)
+            : mouse_button(mouse_button),
+            x_pos(x_pos),
+            y_pos(y_pos)
+        {
+        }
+
+        virtual EventType get_type() const override
+        {
+            return type;
+        }
+        
+        MouseButton mouse_button;
+        double x_pos;
+        double y_pos;
+
+        static const EventType type = EventType::MouseButtonReleased;
     };
 }

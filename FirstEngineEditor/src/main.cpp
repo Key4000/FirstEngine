@@ -9,8 +9,6 @@ class FirstEngineEditor : public FirstEngine::Application
 	//каждый кадр в основном цикле!!! 
 	virtual void on_update()  override
 	{
-		bool move_camera = false;
-
 		//векторы смещения
 		glm::vec3 movement_delta{0, 0, 0};
 		glm::vec3 rotation_delta{0, 0, 0};
@@ -19,67 +17,53 @@ class FirstEngineEditor : public FirstEngine::Application
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_W))
 		{
 			movement_delta.x += 0.05f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_S))
 		{
 			movement_delta.x -= 0.05f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_A))
 		{
 			movement_delta.y -= 0.05f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_D))
 		{
 			movement_delta.y += 0.05f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_E))
 		{
 			movement_delta.z += 0.05f; 
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_Q))
 		{
 			movement_delta.z -= 0.05f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_UP))
 		{
 			rotation_delta.y -= 0.5f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_DOWN))
 		{
 			rotation_delta.y += 0.5f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_RIGHT))
 		{
 			rotation_delta.z -= 0.5f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_LEFT))
 		{ 
 			rotation_delta.z += 0.5f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_P))
 		{
 			rotation_delta.x += 0.5f;
-			move_camera = true;
 		}
 		if (FirstEngine::Input::IsKeyPressed(FirstEngine::KeyCode::KEY_O))
 		{
 			rotation_delta.x -= 0.5f;
-			move_camera = true;
 		}
 		
-		if (move_camera) {
-			camera.add_movement_and_rotation(movement_delta, rotation_delta);
-		}
+		camera.add_movement_and_rotation(movement_delta, rotation_delta);
 		
 	}
 	//------------------------------------------------------------------//

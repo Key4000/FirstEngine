@@ -11,7 +11,7 @@ namespace FirstEngine{
 
 #else
 
-	//обертка для логов , чтобы потом можно было поменять библиотеку 
+	//обертка для логов , чтобы потом можно было поменять библиотеку
 	#define LOG_INFO(...)		spdlog::info(__VA_ARGS__);
 	#define LOG_WARN(...)		spdlog::warn(__VA_ARGS__);
 	#define LOG_ERROR(...)		spdlog::error(__VA_ARGS__);

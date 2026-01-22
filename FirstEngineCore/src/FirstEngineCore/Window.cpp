@@ -136,6 +136,34 @@ namespace FirstEngine {
 			}
 		);
 
+		//нажатие кнопки мышки
+		glfwSetMouseButtonCallback(m_pWindow,
+			[](GLFWwindow* pWindow, int button, int action, int mods)
+			{
+				
+				double x_pos;
+				double y_pos;
+				//запишем координаты курсора
+				glfwGetCursorPos(pWindow, &x_pos, &y_pos);
+				WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(pWindow));
+				switch (action)
+				{
+					case GLFW_PRESS:
+					{
+						EventMouseButtonPressed event(static_cast<MouseButton>(button), x_pos, y_pos);
+						data.eventCallbackFn(event);
+						break;
+					}
+					case GLFW_RELEASE:
+					{
+						EventMouseButtonReleased event(static_cast<MouseButton>(button), x_pos, y_pos);
+						data.eventCallbackFn(event);
+						break;
+					}					
+				}
+			}
+		);
+
 
 		//--------------------------------------------------------------
 
@@ -163,5 +191,15 @@ namespace FirstEngine {
 		glfwDestroyWindow(m_pWindow);
 		//удаляем GLFW контекст
 		glfwTerminate();
+	}
+
+	//получить текущее положение курсора
+	glm::vec2 Window::get_current_cursor_position() const
+	{
+		double x_pos;
+		double y_pos;
+		//запишем координаты курсора
+		glfwGetCursorPos(m_pWindow, &x_pos, &y_pos);
+		return glm::vec2{x_pos, y_pos};
 	}
 }
