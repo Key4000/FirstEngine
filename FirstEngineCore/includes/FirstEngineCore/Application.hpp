@@ -24,6 +24,14 @@ namespace FirstEngine {
 		//кастомный ui, для задания его в Editor
 		virtual void on_ui_draw() {}
 
+        //
+        virtual void on_mouse_button_event(const MouseButton button_code,
+                                                   const double x_pos,
+                                                   const double y_pos,
+                                                   const bool pressed) {}
+        //получить текущую позицию 
+        glm::vec2 get_current_cursor_position() const;
+
 		//камера
 		float camera_position[3] = { 0.f, 0.f, 1.f };
 		float camera_rotation[3] = { 0.f, 0.f, 0.f };
