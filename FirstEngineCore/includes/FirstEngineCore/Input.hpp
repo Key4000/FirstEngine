@@ -12,6 +12,7 @@ namespace FirstEngine {
         static void ReleaseKey(const KeyCode key_code);
 
     private:
-        static bool m_keys_pressed[static_cast<size_t>(KeyCode::KEY_LAST)];
+        static bool m_keys_pressed[];
+        static bool m_mouse_buttons_pressed[];
 };
 }
