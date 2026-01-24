@@ -2,8 +2,9 @@
 
 namespace FirstEngine {
     //массив с нажатыми клавишами
-    bool Input::m_keys_pressed[static_cast<size_t>(KeyCode::KEY_LAST)] = {};
-
+    bool Input::m_keys_pressed[static_cast<size_t>(KeyCode::KEY_LAST) + 1] = {};
+    bool Input::m_mouse_buttons_pressed[static_cast<size_t>(MouseButton::MOUSE_BUTTON_LAST) + 1];
+     
     //проверка
     bool Input::IsKeyPressed(const KeyCode key_code)
     {
