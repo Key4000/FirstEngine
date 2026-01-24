@@ -109,7 +109,24 @@ namespace FirstEngine {
 				m_bCloseWindow = true;
 			});
 
+        //слушатель нажатия мышки 
+		m_event_dispatcher.add_event_listener<EventMouseButtonPressed>(
+			[&](EventMouseButtonPressed& event)
+			{
+                LOG_INFO("[Mouse button pressed: {0}, at ({1}, {2})", event.mouse_button, event.x_pos, event.y_pos);
+				Input::PressMouseButton(event.mouse_button);
+				on_mouse_button_event(event.mouse_button, event.x_pos, event.y_pos, true);
+			}); 
+        //слушатель отпуска кнопки мышки 
+		m_event_dispatcher.add_event_listener<EventMouseButtonReleased>(
+            [&](EventMouseButtonReleased& event)
+            {
+                LOG_INFO("[Mouse button released: {0}, at ({1}, {2})", event.mouse_button, event.x_pos, event.y_pos);
+                Input::ReleaseMouseButton(event.mouse_button);
+                on_mouse_button_event(event.mouse_button, event.x_pos, event.y_pos, false);
+            });
 
+		
 		//слушатель нажатия клавиши
 		m_event_dispatcher.add_event_listener<EventKeyPressed>(
 			[&](EventKeyPressed& event)
