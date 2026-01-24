@@ -262,6 +262,10 @@ namespace FirstEngine {
 
 		return 0;
 	}
-
+    //получить текущую позицию курсора 
+    glm::vec2 Application::get_current_cursor_position() const
+    {
+        return m_pWindow->get_current_cursor_position();
+	} 
 
 }
